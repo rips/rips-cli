@@ -30,7 +30,7 @@ You can also use environment variables to set certain properties.
 Call `rips-cli` without any parameters to see a list of all commands. Use `--help` or `-h` in combination with a command to see all available parameters.
 
 #### Errors
-In case an API request fails, you will see an error message. A list with common errors and their solutions is available at https://kb.ripstech.com/display/DOC/Troubleshooting.
+In case an API request fails you will see an error message. A list with common errors and their solutions is available at https://kb.ripstech.com/display/DOC/Troubleshooting.
 
 #### Filter
 Many commands allow you to use the filter system of the API. It is accessible through query parameters (`--parameter` or `-p`). More information are available at https://kb.ripstech.com/display/DOC/Filter.
@@ -84,7 +84,7 @@ This command allows you to modify the shown columns of a table.
  * rips-cli rips:list:setup -t issues --remove
 
 ### rips:issues:review
-This command allows you mass review issues.
+This command allows you to mass review issues.
 
 #### Examples
  * rips-cli rips:issues:review
