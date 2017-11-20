@@ -5,6 +5,10 @@ A command line interface for RIPS v2.
 
 # Requirements
 To use `rips-cli` you need `php-cli` as well as the `php-zip` extension.
+It is recommended to use the PHAR build of `rips-cli` from https://kb.ripstech.com/display/DOC/RIPS+CLI. If you do not plan to use the PHAR you have to download the dependencies with Composer first. Also, you have to execute `bin/console` instead of `rips-cli`.
+
+ * composer install
+ * php bin/console
 
 # Usage
 ## Configuration
@@ -21,19 +25,18 @@ You can also use environment variables to set certain properties.
 | RIPS_CONFIG   | Set path to configuration file |
 
 ## Commands
-
 ### General
 #### Help
 Call `rips-cli` without any parameters to see a list of all commands. Use `--help` or `-h` in combination with a command to see all available parameters.
 
-#### Input/Output
-If required parameters are not specified there are `stdin` fall-backs in place to get values. The fall-backs can be suppressed by appending `--no-interaction` or `-n` to the command. If you do not want to see output use `--quiet` or `-q`. If you want to see a lot of output use `--verbose` or `-v`.
+#### Errors
+In case an API request fails, you will see an error message. A list with common errors and their solutions is available at https://kb.ripstech.com/display/DOC/Troubleshooting.
 
 #### Filter
 Many commands allow you to use the filter system of the API. It is accessible through query parameters (`--parameter` or `-p`). More information are available at https://kb.ripstech.com/display/DOC/Filter.
 
-#### Errors
-In case an API request fails, you will see an error message. A list with common errors and their solutions is available at https://kb.ripstech.com/display/DOC/Troubleshooting.
+#### Input/Output
+If required parameters are not specified there are `stdin` fall-backs in place to get values. The fall-backs can be suppressed by appending `--no-interaction` or `-n` to the command. If you do not want to see output use `--quiet` or `-q`. If you want to see a lot of output use `--verbose` or `-v`.
 
 ### rips:application:create
 This command creates a new application.
