@@ -63,7 +63,7 @@ class ListCommand extends ContainerAwareCommand
             return 1;
         }
 
-        // Dynamically get all items.
+        // Dynamically get all arguments.
         $arguments = $input->getArgument('arguments');
         $filteredArguments = [];
 

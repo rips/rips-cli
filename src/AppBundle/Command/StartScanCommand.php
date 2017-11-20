@@ -140,9 +140,9 @@ class StartScanCommand extends ContainerAwareCommand
             $scanInput['upload'] = $upload->getId();
         }
 
-        if ($quota = $input->getOption('quota')) {
-            $output->writeln('<comment>Info:</comment> Using quota "' . $quota . '" to start scan', OutputInterface::VERBOSITY_VERBOSE);
-            $scanInput['chargedQuota'] = $quota;
+        if ($quotaId = $input->getOption('quota')) {
+            $output->writeln('<comment>Info:</comment> Using quota "' . $quotaId . '" to start scan', OutputInterface::VERBOSITY_VERBOSE);
+            $scanInput['chargedQuota'] = $quotaId;
         }
 
         /** @var \RIPS\ConnectorBundle\Services\Application\ScanService $scanService */
