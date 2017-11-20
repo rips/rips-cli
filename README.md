@@ -55,7 +55,7 @@ The command has a `threshold` parameter. If the parameter is specified, the scri
  * rips-cli rips:scan:start -a 1 -p /var/www --threshold 0 -v
  * rips-cli rips:scan:start -a 1 -p dvwa -n 'DVWA 1.8' --local -v
  * rips-cli rips:scan:start -a 1 -U 3 --keep-upload -t 4
- * rips-cli rips:scan:start -a 1 -Q 4 -p /var/www -E 'config\.php$' -E 'test\/\.git'
+ * rips-cli rips:scan:start -a 1 -Q 4 -p /var/www -E 'config\\.php$' -E 'test\\/\\.git'
 
 ### rips:scan:export
 This command exports a scan to PDF, CSV, or Jira CSV.
