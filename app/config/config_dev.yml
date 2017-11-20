@@ -1,0 +1,5 @@
+imports:
+    - { resource: config.yml }
+
+parameters:
+    default_api_url: "https://api-test2.internal.ripstech.com"

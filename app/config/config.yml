@@ -1,0 +1,401 @@
+imports:
+    - { resource: services.yml }
+
+parameters:
+    locale: en
+    config_file: '%env(RIPS_CONFIG)%'
+    env(HOME): '.'
+    env(RIPS_CONFIG): '%env(HOME)%/.rips.yml'
+    default_api_url: 'https://api-2.ripstech.com'
+    file_extensions: ["php", "inc", "phps", "php3", "php4", "php5", "phtml", "tpl", "cgi", "module"]
+    archive_extensions: ["zip", "gz", "bz2"]
+
+    export_types:
+        pdf:
+            method: "exportPdf"
+            extension: "pdf"
+        csv:
+            method: "exportCsv"
+            extension: "csv"
+        jiracsv:
+            method: "exportJiraCsv"
+            extension: "csv"
+            default_parameters:
+                summary: true
+                context: true
+                vulnerabilityDescription: true
+    tables:
+        issue_types:
+            columns:
+                id:
+                    methods: ["getId"]
+                    default: true
+                tag:
+                    methods: ["getTag"]
+                name:
+                    methods: ["getName"]
+                    default: true
+                markup:
+                    methods: ["getMarkup"]
+                    default: true
+                severity:
+                    methods: ["getSeverity"]
+                    default: true
+                parent:
+                    methods: ["getParent", "getId"]
+                    default: true
+                cwe:
+                    methods: ["getCwe"]
+                owasp:
+                    methods: ["getOwasp"]
+                sans:
+                    methods: ["getSans"]
+                pcidss:
+                    methods: ["getPcidss"]
+            service:
+                name: "rips_connector.application.scan.issue.types"
+                list:
+                    method: "getAll"
+        review_types:
+            columns:
+                id:
+                    methods: ["getId"]
+                    default: true
+                tag:
+                    methods: ["getTag"]
+                    default: true
+                name:
+                    methods: ["getName"]
+                    default: true
+            service:
+                name: "rips_connector.application.scan.issue.review.types"
+                list:
+                    method: "getAll"
+        origin_types:
+            columns:
+                id:
+                    methods: ["getId"]
+                    default: true
+                tag:
+                    methods: ["getTag"]
+                    default: true
+                name:
+                    methods: ["getName"]
+                    default: true
+            service:
+                name: "rips_connector.application.scan.issue.origin.types"
+                list:
+                    method: "getAll"
+        applications:
+            columns:
+                id:
+                    methods: ["getId"]
+                    default: true
+                name:
+                    methods: ["getName"]
+                    default: true
+                current_scan:
+                    methods: ["getCurrentScan"]
+                    default: true
+                created_by_id:
+                    methods: ["getCreatedBy", "getId"]
+                created_by_username:
+                    methods: ["getCreatedBy", "getUsername"]
+                    default: true
+                created_by_firstname:
+                    methods: ["getCreatedBy", "getFirstname"]
+                created_by_lastname:
+                    methods: ["getCreatedBy", "getLastname"]
+                charged_quota_id:
+                    methods: ["getChargedQuota", "getId"]
+                creation:
+                    methods: ["getCreation"]
+                    default: true
+            service:
+                name: "rips_connector.applications"
+                list:
+                    method: "getAll"
+        scans:
+            columns:
+                id:
+                    methods: ["getId"]
+                    default: true
+                version:
+                    methods: ["getVersion"]
+                    default: true
+                path:
+                    methods: ["getPath"]
+                    path: true
+                start:
+                    methods: ["getStart"]
+                    default: true
+                finish:
+                    methods: ["getFinish"]
+                    default: true
+                phase:
+                    methods: ["getPhase"]
+                percent:
+                    methods: ["getPercent"]
+                    default: true
+                loc:
+                    methods: ["getLoc"]
+                    default: true
+                coded_stored:
+                    methods: ["getCodeStored"]
+                upload_removed:
+                    methods: ["getUploadRemoved"]
+                process_id:
+                    methods: ["getProcess", "getId"]
+                process_start:
+                    methods: ["getProcess", "getStart"]
+                process_finish:
+                    methods: ["getProcess", "getFinish"]
+                process_version:
+                    methods: ["getProcess", "getVersion"]
+                application_id:
+                    methods: ["getApplication", "getId"]
+                    default: true
+                application_name:
+                    methods: ["getApplication", "getName"]
+                    default: true
+                application_current_scan:
+                    methods: ["getApplication", "getCurrentScan"]
+                application_creation:
+                    methods: ["getApplication", "getCreation"]
+                created_by_id:
+                    methods: ["getCreatedBy", "getId"]
+                created_by_username:
+                    methods: ["getCreatedBy", "getUsername"]
+                    default: true
+                created_by_firstname:
+                    methods: ["getCreatedBy", "getFirstname"]
+                created_by_lastname:
+                    methods: ["getCreatedBy", "getLastname"]
+            service:
+                name: "rips_connector.application.scans"
+                list:
+                    method: "getAll"
+                    arguments:
+                        application_id:
+                            required: false
+        issues:
+            columns:
+                id:
+                    methods: ["getId"]
+                    default: true
+                origin_id:
+                    methods: ["getOrigin", "getId"]
+                origin_tag:
+                    methods: ["getOrigin", "getTag"]
+                origin_name:
+                    methods: ["getOrigin", "getName"]
+                    default: true
+                depth:
+                    methods: ["getDepth"]
+                    default: true
+                type_id:
+                    methods: ["getType", "getId"]
+                type_tag:
+                    methods: ["getType", "getTag"]
+                type_description:
+                    methods: ["getType", "getDescription"]
+                type_name:
+                    methods: ["getType", "getName"]
+                    default: true
+                type_markup:
+                    methods: ["getType", "getMarkup"]
+                type_severity:
+                    methods: ["getType", "getSeverity"]
+                    default: true
+                type_effort:
+                    methods: ["getType", "getEffort"]
+                type_cwe:
+                    methods: ["getType", "getCwe"]
+                type_owasp:
+                    methods: ["getType", "getOwasp"]
+                type_sans:
+                    methods: ["getType", "getSans"]
+                type_pcidss:
+                    methods: ["getType", "getPcidss"]
+                review_id:
+                    methods: ["getLastReview", "getId"]
+                review_submission:
+                    methods: ["getLastReview", "getSubmission"]
+                review_type_id:
+                    methods: ["getLastReview", "getType", "getId"]
+                review_type_tag:
+                    methods: ["getLastReview", "getType", "getTag"]
+                review_type_name:
+                    methods: ["getLastReview", "getType", "getName"]
+                    default: true
+                reviewed:
+                    methods: ["getReviewed"]
+                negatively_reviewed:
+                    methods: ["getNegativelyReviewed"]
+                sink_id:
+                    methods: ["getSink", "getId"]
+                sink_line:
+                    methods: ["getSink", "getLine"]
+                    default: true
+                sink_name:
+                    methods: ["getSink", "getName"]
+                    default: true
+                sink_file_id:
+                    methods: ["getSink", "getFile", "getId"]
+                sink_file_loc:
+                    methods: ["getSink", "getFile", "getLoc"]
+                sink_file_path:
+                    methods: ["getSink", "getFile", "getPath"]
+                    default: true
+                    path: true
+                scan_id:
+                    methods: ["getScan", "getId"]
+                scan_version:
+                    methods: ["getScan", "getVersion"]
+                scan_path:
+                    methods: ["getScan", "getPath"]
+                    path: true
+                scan_start:
+                    methods: ["getScan", "getStart"]
+                scan_finish:
+                    methods: ["getScan", "getFinish"]
+                scan_phase:
+                    methods: ["getScan", "getPhase"]
+                scan_percent:
+                    methods: ["getScan", "getPercent"]
+                scan_loc:
+                    methods: ["getScan", "getLoc"]
+                scan_code_stored:
+                    methods: ["getScan", "getCodeStored"]
+                scan_upload_removed:
+                    methods: ["getScan", "getUploadRemoved"]
+                scan_application_id:
+                    methods: ["getScan", "getApplication", "getId"]
+                scan_application_name:
+                    methods: ["getScan", "getApplication", "getName"]
+                scan_application_current_scan:
+                    methods: ["getScan", "getApplication", "getCurrentScan"]
+                scan_application_creation:
+                    methods: ["getScan", "getApplication", "getCreation"]
+                scan_created_by_id:
+                    methods: ["getScan", "getCreatedBy", "getId"]
+                scan_created_by_username:
+                    methods: ["getScan", "getCreatedBy", "getUsername"]
+                scan_created_by_firstname:
+                    methods: ["getScan", "getCreatedBy", "getFirstname"]
+                scan_created_by_lastname:
+                    methods: ["getScan", "getCreatedBy", "getLastname"]
+                source_id:
+                    methods: ["getSource", "getId"]
+                source_line:
+                    methods: ["getSource", "getLine"]
+                    default: true
+                source_name:
+                    methods: ["getSource", "getName"]
+                    default: true
+                source_file_path:
+                    methods: ["getSource", "getFile", "getPath"]
+                    path: true
+                source_parameter:
+                    methods: ["getSource", "getParameter"]
+                    default: true
+            service:
+                name: "rips_connector.application.scan.issues"
+                list:
+                    method: "getAll"
+                    arguments:
+                        application_id:
+                            required: true
+                        scan_id:
+                            required: true
+        quotas:
+            columns:
+                id:
+                    methods: ["getId"]
+                    default: true
+                current_application:
+                    methods: ["getCurrentApplication"]
+                    default: true
+                current_scan:
+                    methods: ["getCurrentScan"]
+                    default: true
+                current_user:
+                    methods: ["getCurrentUser"]
+                    default: true
+                max_applications:
+                    methods: ["getMaxApplications"]
+                    default: true
+                max_scans:
+                    methods: ["getMaxScans"]
+                    default: true
+                max_users:
+                    methods: ["getMaxUsers"]
+                    default: true
+                max_loc:
+                    methods: ["getMaxLoc"]
+                    default: true
+                valid_from:
+                    methods: ["getValidFrom"]
+                    default: true
+                valid_until:
+                    methods: ["getValidUntil"]
+                    default: true
+            service:
+                name: "rips_connector.quotas"
+                list:
+                    method: "getAll"
+        uploads:
+            columns:
+                id:
+                    methods: ["getId"]
+                    default: true
+                submission:
+                    methods: ["getSubmission"]
+                    default: true
+                name:
+                    methods: ["getName"]
+                    default: true
+                extension:
+                    methods: ["getExtension"]
+                size:
+                    methods: ["getSize"]
+                    default: true
+                file:
+                    methods: ["getFile"]
+                created_by_id:
+                    methods: ["getCreatedBy", "getId"]
+                created_by_username:
+                    methods: ["getCreatedBy", "getUsername"]
+                    default: true
+                created_by_firstname:
+                    methods: ["getCreatedBy", "getFirstname"]
+                created_by_lastname:
+                    methods: ["getCreatedBy", "getLastname"]
+            service:
+                name: "rips_connector.application.uploads"
+                list:
+                    method: "getAll"
+                    arguments:
+                        application_id:
+                            required: true
+        customs:
+            columns:
+                id:
+                    methods: ["getId"]
+                    default: true
+                name:
+                    methods: ["getName"]
+                    default: true
+                global:
+                    methods: ["getGlobal"]
+                    default: true
+            service:
+                name: "rips_connector.application.customs"
+                list:
+                    method: "getAll"
+                    arguments:
+                        application_id:
+                            required: false
+
+framework:
+    secret: ''

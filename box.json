@@ -1,0 +1,28 @@
+{
+  "chmod": "0755",
+  "directories": [
+    "app",
+    "bin",
+    "src"
+  ],
+  "files": [
+    "composer.json",
+    "composer.lock"
+  ],
+  "finder": [
+    {
+      "name": "*",
+      "exclude": ["Tests"],
+      "in": "vendor"
+    },
+    {
+      "name": "*",
+      "exclude": ["logs", "sessions/*.php", "cache/dev/*", "cache/test"],
+      "in": "var"
+    }
+  ],
+  "main": "bin/console",
+  "output": "rips-cli.phar",
+  "compression": "GZ",
+  "stub": true
+}
