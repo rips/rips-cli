@@ -49,6 +49,13 @@ class ConfigService
      */
     public function saveConfig($content)
     {
+        // If there is no config file we create one with secure permissions. If the users want to change the
+        // permissions afterwards that is their choice.
+        if (!file_exists($this->file)) {
+            touch($this->file);
+            chmod($this->file, 0600);
+        }
+
         // Store on disk.
         file_put_contents($this->file, Yaml::dump($content));
 
