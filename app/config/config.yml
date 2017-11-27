@@ -115,6 +115,16 @@ parameters:
                 name: "rips_connector.applications"
                 list:
                     method: "getAll"
+                show:
+                    method: "getById"
+                    arguments:
+                        application_id:
+                            required: true
+                delete:
+                    method: "deleteById"
+                    arguments:
+                        application_id:
+                            methods: ["getId"]
         scans:
             columns:
                 id:
@@ -178,6 +188,20 @@ parameters:
                     arguments:
                         application_id:
                             required: false
+                show:
+                    method: "getById"
+                    arguments:
+                        application_id:
+                            required: true
+                        scan_id:
+                            required: true
+                delete:
+                    method: "deleteById"
+                    arguments:
+                        application_id:
+                            methods: ["getApplication", "getId"]
+                        scan_id:
+                            methods: ["getId"]
         issues:
             columns:
                 id:
@@ -378,6 +402,20 @@ parameters:
                     arguments:
                         application_id:
                             required: true
+                show:
+                    method: "getById"
+                    arguments:
+                        application_id:
+                            required: true
+                        upload_id:
+                            required: true
+                delete:
+                    method: "deleteById"
+                    arguments:
+                        application_id:
+                            methods: ["getApplication", "getId"]
+                        upload_id:
+                            methods: ["getId"]
         customs:
             columns:
                 id:
@@ -396,6 +434,20 @@ parameters:
                     arguments:
                         application_id:
                             required: false
+                show:
+                    method: "getById"
+                    arguments:
+                        application_id:
+                            required: true
+                        custom_id:
+                            required: true
+                delete:
+                    method: "deleteById"
+                    arguments:
+                        application_id:
+                            methods: ["getApplication", "getId"]
+                        custom_id:
+                            methods: ["getId"]
 
 framework:
     secret: ''
