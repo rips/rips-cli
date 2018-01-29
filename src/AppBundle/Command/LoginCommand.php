@@ -80,15 +80,21 @@ class LoginCommand extends ContainerAwareCommand
                 $loginPassword = $helper->ask($input, $output, $loginPasswordQuestion);
             };
 
-            // Before the credentials are stored the user might want to check them first.
-            $api->initialize($loginUsername, $loginPassword, $settings);
-
             try {
+                // Before the credentials are stored the user might want to check them first.
+                $api->initialize($loginUsername, $loginPassword, $settings);
+
                 $output->writeln('<comment>Info:</comment> Requesting status', OutputInterface::VERBOSITY_VERBOSE);
                 $api->getStatus();
                 $output->writeln('<info>Success:</info> Authentication successful');
             } catch (ClientException $e) {
                 $output->writeln('<error>Failure:</error> Invalid credentials');
+
+                if (!$input->getOption('force')) {
+                    return 1;
+                }
+            } catch (\Exception $e) {
+                $output->writeln('<error>Failure:</error> Can\'t connect to the API');
 
                 if (!$input->getOption('force')) {
                     return 1;
