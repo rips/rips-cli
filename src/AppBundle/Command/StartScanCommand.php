@@ -24,7 +24,7 @@ class StartScanCommand extends ContainerAwareCommand
             ->addOption('exclude-path', 'E', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Exclude files from archive with regular expressions')
             ->addOption('upload', 'U', InputOption::VALUE_REQUIRED, 'Set existing upload id')
             ->addOption('name', 'N', InputOption::VALUE_REQUIRED, 'Set version name')
-            ->addOption('threshold', 't', InputOption::VALUE_REQUIRED, 'Set threshold when the scan should fail (exit code 2)')
+            ->addOption('threshold', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Set threshold when the scan should fail (exit code 2)')
             ->addOption('local', 'l', InputOption::VALUE_NONE, 'Set to true if you want to start a scan by local path')
             ->addOption('quota', 'Q', InputOption::VALUE_REQUIRED, 'Set quota id')
             ->addOption('custom', 'C', InputOption::VALUE_REQUIRED, 'Set custom id (analysis profile)')
@@ -157,8 +157,8 @@ class StartScanCommand extends ContainerAwareCommand
         }
 
         // Wait for scan to finish if user wants an exit code based on the results.
-        $threshold = $input->getOption('threshold');
-        if (!is_null($threshold)) {
+        $thresholds = $input->getOption('threshold');
+        if (!is_null($thresholds)) {
             $output->writeln('<comment>Info:</comment> Waiting for scan "' . $scan->getVersion() . '" (' . $scan->getId() . ') to finish', OutputInterface::VERBOSITY_VERBOSE);
             $scan = $scanService->blockUntilDone($applicationId, $scan->getId(), 0, 5, [
                 'issueNegativelyReviewed' => 0,
@@ -166,15 +166,42 @@ class StartScanCommand extends ContainerAwareCommand
             ]);
             $output->writeln('<comment>Info:</comment> Scan "' . $scan->getVersion() . '" (' . $scan->getId() . ') finished at ' . $scan->getFinish()->format(DATE_ISO8601), OutputInterface::VERBOSITY_VERBOSE);
 
-            // Sum up all unreviewed issues and compare to the threshold. Filtering by category can be added later.
-            $issueSum = array_sum($scan->getSeverityDistributions());
+            $severityDistributions = array_change_key_case($scan->getSeverityDistributions());
+            $severityDistributions['sum'] = array_sum($severityDistributions);
 
-            if ($issueSum > $threshold) {
-                $output->writeln('<error>Failure:</error> Number of issues exceeds threshold (' . $issueSum . '/' . $threshold . ')');
-                return 2;
-            } else {
-                $output->writeln('<info>Success:</info> Number of issues does not exceed threshold (' . $issueSum . '/' . $threshold . ')');
+            $exitCode = 0;
+            foreach ($thresholds as $threshold) {
+                // Turn numbers into sum for backwards compatibility.
+                if (is_numeric($threshold)) {
+                    $threshold = 'sum:' . $threshold;
+                }
+
+                // Separate threshold into category and value.
+                try {
+                    list($thresholdCategory, $thresholdValue) = explode(":", $threshold, 2);
+                } catch (\Exception $e) {
+                    $output->writeln('<error>Failure:</error> Invalid threshold ' . $threshold . ' (category:value)');
+                    $exitCode = 2;
+                    continue;
+                }
+
+                if (!isset($severityDistributions[$thresholdCategory])) {
+                    $availableCategories = implode(', ', array_keys($severityDistributions));
+                    $output->writeln('<error>Failure:</error> Threshold category ' . $thresholdCategory . ' does not exist (' . $availableCategories . ')');
+                    $exitCode = 2;
+                    continue;
+                }
+
+                $issueCount = $severityDistributions[$thresholdCategory];
+
+                if ($issueCount > $thresholdValue) {
+                    $output->writeln('<error>Failure:</error> Number of issues exceeds ' . $thresholdCategory . ' threshold (' . $issueCount . '/' . $thresholdValue . ')');
+                    $exitCode = 2;
+                } else {
+                    $output->writeln('<info>Success:</info> Number of issues does not exceed ' . $thresholdCategory . ' threshold (' . $issueCount . '/' . $thresholdValue . ')');
+                }
             }
+            return $exitCode;
         }
 
         return 0;
