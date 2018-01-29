@@ -48,13 +48,14 @@ This command creates a new application.
 ### rips:scan:start
 This command starts a scan. It can either upload an existing archive, upload a directory, use an existing upload, or start a scan with a local path.
 
-The command has a `threshold` parameter. If the parameter is specified, the script waits until the scan is finished and compares the number of unreviewed issues to the threshold. If the number of issues exceeds the threshold, the program exits with the status code `2`.
+The command has a `threshold` parameter. If the parameter is specified once or multiple times, the script waits until the scan is finished and compares the number of unreviewed issues to the thresholds. If the number of issues exceeds the thresholds, the program exits with the status code `2`.
+A threshold consists of a category (`low`, `medium`, `high`, `critical`, `sum`), a colon, and a number. A threshold that consists only of a number is treated like `sum`.
 
 #### Examples
  * rips-cli rips:scan:start
  * rips-cli rips:scan:start -a 1 -p /var/www --threshold 0 -v
  * rips-cli rips:scan:start -a 1 -p dvwa -N 'DVWA 1.8' --local -v
- * rips-cli rips:scan:start -a 1 -U 3 --keep-upload -t 4
+ * rips-cli rips:scan:start -a 1 -U 3 --keep-upload -t 14 -t high:5 -t critical:0
  * rips-cli rips:scan:start -a 1 -Q 4 -p /var/www -E 'config\\.php$' -E 'test\\/\\.git'
 
 ### rips:scan:export
