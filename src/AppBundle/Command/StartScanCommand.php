@@ -177,15 +177,22 @@ class StartScanCommand extends ContainerAwareCommand
                 }
 
                 // Separate threshold into category and value.
-                list($thresholdCategory, $thresholdValue) = explode(":", $threshold, 2);
+                try {
+                    list($thresholdCategory, $thresholdValue) = explode(":", $threshold, 2);
+                } catch (\Exception $e) {
+                    $output->writeln('<error>Failure:</error> Invalid threshold ' . $threshold . ' (category:value)');
+                    $exitCode = 2;
+                    continue;
+                }
 
                 if (!isset($severityDistributions[$thresholdCategory])) {
                     $availableCategories = implode(', ', array_keys($severityDistributions));
                     $output->writeln('<error>Failure:</error> Threshold category ' . $thresholdCategory . ' does not exist (' . $availableCategories . ')');
-                    return 2;
-                } else {
-                    $issueCount = $severityDistributions[$thresholdCategory];
+                    $exitCode = 2;
+                    continue;
                 }
+
+                $issueCount = $severityDistributions[$thresholdCategory];
 
                 if ($issueCount > $thresholdValue) {
                     $output->writeln('<error>Failure:</error> Number of issues exceeds ' . $thresholdCategory . ' threshold (' . $issueCount . '/' . $thresholdValue . ')');
