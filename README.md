@@ -48,13 +48,14 @@ This command creates a new application.
 ### rips:scan:start
 This command starts a scan. It can either upload an existing archive, upload a directory, use an existing upload, or start a scan with a local path.
 
-The command has a `threshold` parameter. If the parameter is specified, the script waits until the scan is finished and compares the number of unreviewed issues to the threshold. If the number of issues exceeds the threshold, the program exits with the status code `2`.
+The command has a `threshold` parameter. If the parameter is specified once or multiple times, the script waits until the scan is finished and compares the number of unreviewed issues to the thresholds. If the number of issues exceeds the thresholds, the program exits with the status code `2`.
+A threshold consists of a category (`low`, `medium`, `high`, `critical`, `sum`), a colon, and a number. A threshold that consists only of a number is treated like `sum`.
 
 #### Examples
  * rips-cli rips:scan:start
  * rips-cli rips:scan:start -a 1 -p /var/www --threshold 0 -v
  * rips-cli rips:scan:start -a 1 -p dvwa -N 'DVWA 1.8' --local -v
- * rips-cli rips:scan:start -a 1 -U 3 --keep-upload -t 4
+ * rips-cli rips:scan:start -a 1 -U 3 --keep-upload -t 14 -t high:5 -t critical:0
  * rips-cli rips:scan:start -a 1 -Q 4 -p /var/www -E 'config\\.php$' -E 'test\\/\\.git'
 
 ### rips:scan:export
@@ -74,6 +75,16 @@ This command lists entries of a table.
  * rips-cli rips:list -t scans -p 'equal[percent]=100' -p 'greaterThan[loc]=5000' 1
  * rips-cli rips:list -t scans -n
  * rips-cli rips:list -t issues --max-chars 160 1 10
+
+### rips:delete
+This command deletes entries of a table.
+
+By default this command only deletes single entries. Enable `--list` or `-L` to delete multiple entries at once.
+
+#### Examples
+ * rips-cli rips:delete
+ * rips-cli rips:delete -t scans 1 5
+ * rips-cli rips:delete -t applications -L -p 'limit=5' -p 'orderBy[currentScan]=desc'
 
 ### rips:list:setup
 This command allows you to modify the shown columns of a table.
