@@ -76,6 +76,16 @@ This command lists entries of a table.
  * rips-cli rips:list -t scans -n
  * rips-cli rips:list -t issues --max-chars 160 1 10
 
+### rips:delete
+This command deletes entries of a table.
+
+By default this command only deletes single entries. Enable `--list` or `-L` to delete multiple entries at once.
+
+#### Examples
+ * rips-cli rips:delete
+ * rips-cli rips:delete -t scans 1 5
+ * rips-cli rips:delete -t applications -L -p 'limit=5' -p 'orderBy[currentScan]=desc'
+
 ### rips:list:setup
 This command allows you to modify the shown columns of a table.
 
