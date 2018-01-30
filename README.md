@@ -66,6 +66,14 @@ This command exports a scan to PDF, CSV, or Jira CSV.
  * rips-cli rips:scan:export -a 1 -s 10 -t pdf -f report
  * rips-cli rips:scan:export -a 1 -s 10 -t jiracsv -p 'equal[origin]=1' -n
 
+### rips:list:setup
+This command allows you to modify the shown columns of a table.
+
+#### Examples
+ * rips-cli rips:list:setup
+ * rips-cli rips:list:setup -t applications
+ * rips-cli rips:list:setup -t issues --remove
+
 ### rips:list
 This command lists entries of a table.
 
@@ -86,13 +94,15 @@ By default this command only deletes single entries. Enable `--list` or `-L` to 
  * rips-cli rips:delete -t scans 1 5
  * rips-cli rips:delete -t applications -L -p 'limit=5' -p 'orderBy[currentScan]=desc'
 
-### rips:list:setup
-This command allows you to modify the shown columns of a table.
+### rips:issues:list
+This command allows you to search through all issues.
+
+The command first searches for all available scans and then searches for issues in the scans. Both processes can be filtered through own query parameters.
+If no parameters are specified all issues are shown. Depending on the amount of scans this might take a while.
 
 #### Examples
- * rips-cli rips:list:setup
- * rips-cli rips:list:setup -t applications
- * rips-cli rips:list:setup -t issues --remove
+ * rips-cli rips:issues:list -v
+ * rips-cli rips:issues:list -P limit=15 -P 'orderBy[application]=asc' -P 'orderBy[id]=asc' -p 'greaterThan[typeSeverity]=60'
 
 ### rips:issues:review
 This command allows you to mass review issues.
