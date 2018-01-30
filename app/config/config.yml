@@ -323,6 +323,9 @@ parameters:
                 source_parameter:
                     methods: ["getSource", "getParameter"]
                     default: true
+                cve:
+                    methods: ["getCve"]
+                    default: true
             service:
                 name: "rips_connector.application.scan.issues"
                 list:
