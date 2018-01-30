@@ -103,6 +103,7 @@ If no parameters are specified all issues are shown. Depending on the amount of 
 #### Examples
  * rips-cli rips:issues:list -v
  * rips-cli rips:issues:list -P limit=15 -P 'orderBy[application]=asc' -P 'orderBy[id]=asc' -p 'greaterThan[typeSeverity]=60'
+ * rips-cli rips:issues:list -v --issue-parameter 'notNull[cve]'
 
 ### rips:issues:review
 This command allows you to mass review issues.
