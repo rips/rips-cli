@@ -87,8 +87,10 @@ class ListIssuesCommand extends ContainerAwareCommand
 
         foreach ($scans as $scan) {
             $output->writeln(
-                '<comment>Info:</comment> Searching in application "' . $scan->getApplication()->getName() . '" (' . $scan->getApplication()->getId() . ') ' .
-                'scan "' . $scan->getVersion() . '" (' . $scan->getId() . ')', OutputInterface::VERBOSITY_VERBOSE
+                '<comment>Info:</comment> Searching in application "' .
+                $scan->getApplication()->getName() . '" (' . $scan->getApplication()->getId() . ') ' .
+                'scan "' . $scan->getVersion() . '" (' . $scan->getId() . ')',
+                OutputInterface::VERBOSITY_VERBOSE
             );
 
             /** @var \RIPS\ConnectorBundle\Services\Application\Scan\IssueService $issueService */
