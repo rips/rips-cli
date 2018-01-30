@@ -3,7 +3,7 @@ rips-cli
 
 A command line interface for RIPS v2.
 
-<a href="https://asciinema.org/a/160101?autoplay=1"><img src="https://asciinema.org/a/160101.png" width="500" /></a>
+<a href="https://asciinema.org/a/160101?autoplay=1"><img src="https://asciinema.org/a/160101.png" width="600" /></a>
 
 # Requirements
 To use `rips-cli` you need `php-cli` as well as the `php-zip` extension.
