@@ -46,3 +46,6 @@ services:
         public: true
         calls:
             - [ setFile, ["%config_file%"] ]
+
+    AppBundle\Service\EnvService:
+        public: true

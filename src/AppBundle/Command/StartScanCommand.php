@@ -6,12 +6,14 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Filesystem\Filesystem;
 use RIPS\ConnectorBundle\InputBuilders\Application\Scan\AddBuilder;
 use RIPS\ConnectorBundle\InputBuilders\Application\Scan\TagBuilder;
+use RIPS\ConnectorBundle\InputBuilders\Application\Scan\PhpBuilder;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Question\Question;
 use AppBundle\Service\ArchiveService;
+use AppBundle\Service\EnvService;
 
 class StartScanCommand extends ContainerAwareCommand
 {
@@ -32,6 +34,7 @@ class StartScanCommand extends ContainerAwareCommand
             ->addOption('keep-upload', 'K', InputOption::VALUE_NONE, 'Do not remove upload after scan is finished')
             ->addOption('parent', 'P', InputOption::VALUE_REQUIRED, 'Set parent scan id')
             ->addOption('tag', 'T', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Add tags')
+            ->addOption('env-file', 'F', InputOption::VALUE_REQUIRED, 'Load environment from file')
         ;
     }
 
@@ -150,6 +153,17 @@ class StartScanCommand extends ContainerAwareCommand
         $arrayInput = [
             'scan' => new AddBuilder($scanInput)
         ];
+
+        if ($input->getOption('env-file')) {
+            $output->writeln('<comment>Info:</comment> Using env from ' . $input->getOption('env-file'), OutputInterface::VERBOSITY_VERBOSE);
+            $envService = $this->getContainer()->get(EnvService::class);
+            try {
+                $arrayInput['php'] = new PhpBuilder($envService->loadEnvFromFile('php', $input->getOption('env-file')));
+            } catch (\Exception $e) {
+                $output->writeln('<error>Failure:</error> Error opening env file: ' . $e->getMessage());
+                return 1;
+            }
+        }
 
         if ($input->getOption('tag')) {
             $output->writeln('<comment>Info:</comment> Using tags ' . implode(', ', $input->getOption('tag')), OutputInterface::VERBOSITY_VERBOSE);
