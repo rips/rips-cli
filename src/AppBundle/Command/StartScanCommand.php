@@ -5,6 +5,7 @@ namespace AppBundle\Command;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Filesystem\Filesystem;
 use RIPS\ConnectorBundle\InputBuilders\Application\Scan\AddBuilder;
+use RIPS\ConnectorBundle\InputBuilders\Application\Scan\TagBuilder;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -30,6 +31,7 @@ class StartScanCommand extends ContainerAwareCommand
             ->addOption('custom', 'C', InputOption::VALUE_REQUIRED, 'Set custom id (analysis profile)')
             ->addOption('keep-upload', 'K', InputOption::VALUE_NONE, 'Do not remove upload after scan is finished')
             ->addOption('parent', 'P', InputOption::VALUE_REQUIRED, 'Set parent scan id')
+            ->addOption('tag', 'T', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Add tags')
         ;
     }
 
@@ -145,11 +147,20 @@ class StartScanCommand extends ContainerAwareCommand
             $scanInput['chargedQuota'] = $quotaId;
         }
 
+        $arrayInput = [
+            'scan' => new AddBuilder($scanInput)
+        ];
+
+        if ($input->getOption('tag')) {
+            $output->writeln('<comment>Info:</comment> Using tags ' . implode(', ', $input->getOption('tag')), OutputInterface::VERBOSITY_VERBOSE);
+            $arrayInput['tags'] = new TagBuilder($input->getOption('tag'));
+        }
+
         /** @var \RIPS\ConnectorBundle\Services\Application\ScanService $scanService */
         $scanService = $this->getContainer()->get('rips_connector.application.scans');
 
         $output->writeln('<comment>Info:</comment> Trying to start scan "' . $version . '"', OutputInterface::VERBOSITY_VERBOSE);
-        $scan = $scanService->create($applicationId, new AddBuilder($scanInput));
+        $scan = $scanService->create($applicationId, $arrayInput);
         $output->writeln('<info>Success:</info> Scan "' . $scan->getVersion() . '" (' . $scan->getId() . ') was successfully started at ' . $scan->getStart()->format(DATE_ISO8601));
 
         if ($chargedQuota = $scan->getChargedQuota()) {
