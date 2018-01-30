@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\ConfigService;
 use AppBundle\Service\CredentialService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -31,6 +32,7 @@ class LoginCommand extends ContainerAwareCommand
         $loginPassword = getenv('RIPS_PASSWORD');
 
         $helper = $this->getHelper('question');
+        $configService = $this->getContainer()->get(ConfigService::class);
         $credentialService = $this->getContainer()->get(CredentialService::class);
         $api = $this->getContainer()->get('rips_connector.api');
 
@@ -105,11 +107,11 @@ class LoginCommand extends ContainerAwareCommand
                 if ($input->getOption('force')) {
                     $storeConfirmation = true;
                 } else {
-                    $storeQuestion = new ConfirmationQuestion('Do you really want to store the credentials? (y/n) ', false);
+                    $storeQuestion = new ConfirmationQuestion('Do you really want to store the credentials in ' . $configService->getFile() . '? (y/n) ', false);
                     $storeConfirmation = $helper->ask($input, $output, $storeQuestion);
                 }
                 if ($storeConfirmation) {
-                    $output->writeln('<comment>Info:</comment> Trying to store credentials', OutputInterface::VERBOSITY_VERBOSE);
+                    $output->writeln('<comment>Info:</comment> Trying to store credentials in ' . $configService->getFile(), OutputInterface::VERBOSITY_VERBOSE);
                     $credentialService->storeCredentials($loginUsername, $loginPassword, $apiUri);
                     $output->writeln('<info>Success:</info> Credentials have been stored successfully');
                 }

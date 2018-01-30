@@ -25,6 +25,14 @@ class ConfigService
     }
 
     /**
+     * @return string
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
      * @return array
      */
     public function loadConfig()
