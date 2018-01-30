@@ -3,6 +3,8 @@ rips-cli
 
 A command line interface for RIPS v2.
 
+[![Demo](https://asciinema.org/a/160101.png)](https://asciinema.org/a/160101?autoplay=1)
+
 # Requirements
 To use `rips-cli` you need `php-cli` as well as the `php-zip` extension.
 It is recommended to use the PHAR build of `rips-cli` from https://kb.ripstech.com/display/DOC/RIPS+CLI. If you do not plan to use the PHAR you have to download the dependencies with Composer first. Also, you have to execute `bin/console` instead of `rips-cli`.
