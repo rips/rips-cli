@@ -148,6 +148,8 @@ class ListCommand extends ContainerAwareCommand
                         $row[$key] = $currentValue->format(DATE_RFC822);
                     } elseif (is_bool($currentValue)) {
                         $row[$key] = $currentValue ? 'true' : 'false';
+                    } elseif (is_array($currentValue)) {
+                        $row[$key] = implode(', ', $currentValue);
                     } else {
                         $row[$key] = (string)$currentValue;
                     }

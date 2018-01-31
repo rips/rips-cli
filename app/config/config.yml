@@ -335,42 +335,6 @@ parameters:
                             required: true
                         scan_id:
                             required: true
-        quotas:
-            columns:
-                id:
-                    methods: ["getId"]
-                    default: true
-                current_application:
-                    methods: ["getCurrentApplication"]
-                    default: true
-                current_scan:
-                    methods: ["getCurrentScan"]
-                    default: true
-                current_user:
-                    methods: ["getCurrentUser"]
-                    default: true
-                max_applications:
-                    methods: ["getMaxApplications"]
-                    default: true
-                max_scans:
-                    methods: ["getMaxScans"]
-                    default: true
-                max_users:
-                    methods: ["getMaxUsers"]
-                    default: true
-                max_loc:
-                    methods: ["getMaxLoc"]
-                    default: true
-                valid_from:
-                    methods: ["getValidFrom"]
-                    default: true
-                valid_until:
-                    methods: ["getValidUntil"]
-                    default: true
-            service:
-                name: "rips_connector.quotas"
-                list:
-                    method: "getAll"
         uploads:
             columns:
                 id:
@@ -451,6 +415,167 @@ parameters:
                             methods: ["getApplication", "getId"]
                         custom_id:
                             methods: ["getId"]
+        quotas:
+            columns:
+                id:
+                    methods: ["getId"]
+                    default: true
+                current_application:
+                    methods: ["getCurrentApplication"]
+                    default: true
+                current_scan:
+                    methods: ["getCurrentScan"]
+                    default: true
+                current_user:
+                    methods: ["getCurrentUser"]
+                    default: true
+                max_applications:
+                    methods: ["getMaxApplications"]
+                    default: true
+                max_scans:
+                    methods: ["getMaxScans"]
+                    default: true
+                max_users:
+                    methods: ["getMaxUsers"]
+                    default: true
+                max_loc:
+                    methods: ["getMaxLoc"]
+                    default: true
+                valid_from:
+                    methods: ["getValidFrom"]
+                    default: true
+                valid_until:
+                    methods: ["getValidUntil"]
+                    default: true
+            service:
+                name: "rips_connector.quotas"
+                list:
+                    method: "getAll"
+        users:
+            columns:
+                id:
+                    methods: ["getId"]
+                    default: true
+                username:
+                    methods: ["getUsername"]
+                    default: true
+                email:
+                    methods: ["getEmail"]
+                    default: true
+                firstname:
+                    methods: ["getFirstname"]
+                    default: true
+                lastname:
+                    methods: ["getLastname"]
+                    default: true
+                valid_until:
+                    methods: ["getValidUntil"]
+                roles:
+                    methods: ["getRoles"]
+                    default: true
+                root:
+                    methods: ["getRoot"]
+                    default: true
+                whitelisted_ips:
+                    methods: ["getWhitelistedIps"]
+                callbacks:
+                    methods: ["getCallbacks"]
+            service:
+                name: "rips_connector.users"
+                list:
+                    method: "getAll"
+                show:
+                    method: "getById"
+                    arguments:
+                        user_id:
+                            required: true
+                delete:
+                    method: "deleteById"
+                    arguments:
+                        user_id:
+                            methods: ["getId"]
+        teams:
+            columns:
+                id:
+                    methods: ["getId"]
+                    default: true
+                name:
+                    methods: ["getName"]
+                    default: true
+            service:
+                name: "rips_connector.teams"
+                list:
+                    method: "getAll"
+                show:
+                    method: "getById"
+                    arguments:
+                        team_id:
+                            required: true
+                delete:
+                    method: "deleteById"
+                    arguments:
+                        team_id:
+                            methods: ["getId"]
+        activities:
+            columns:
+                id:
+                    methods: ["getId"]
+                    default: true
+                type:
+                    methods: ["getType"]
+                    default: true
+                created_by_id:
+                    methods: ["getCreatedBy", "getId"]
+                created_by_username:
+                    methods: ["getCreatedBy", "getUsername"]
+                    default: true
+                created_by_firstname:
+                    methods: ["getCreatedBy", "getFirstname"]
+                created_by_lastname:
+                    methods: ["getCreatedBy", "getLastname"]
+                application_id:
+                    methods: ["getApplication", "getId"]
+                    default: true
+                application_name:
+                    methods: ["getApplication", "getName"]
+                    default: true
+                created_at:
+                    methods: ["getCreatedAt"]
+                    default: true
+            service:
+                name: "rips_connector.activities"
+                list:
+                    method: "getAll"
+                show:
+                    method: "getById"
+                    arguments:
+                        activity_id:
+                            required: true
+        settings:
+            columns:
+                key:
+                    methods: ["getKey"]
+                    default: true
+                value:
+                    methods: ["getValue"]
+                    default: true
+                created_at:
+                    methods: ["getCreatedAt"]
+                    default: true
+            service:
+                name: "rips_connector.settings"
+                list:
+                    method: "getAll"
+                show:
+                    method: "getByKey"
+                    arguments:
+                        setting_key:
+                            required: true
+                delete:
+                    method: "deleteByKey"
+                    arguments:
+                        setting_key:
+                            methods: ["getKey"]
 
 framework:
     secret: ''
