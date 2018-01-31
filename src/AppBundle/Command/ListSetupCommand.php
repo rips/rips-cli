@@ -28,7 +28,13 @@ class ListSetupCommand extends ContainerAwareCommand
     {
         $helper = $this->getHelper('question');
         $allTables = $this->getContainer()->getParameter('tables');
-        $availableTables = array_keys($allTables);
+        $availableTables = [];
+
+        foreach ($allTables as $tableName => $tableDetails) {
+            if (isset($tableDetails['service']['list'])) {
+                $availableTables[] = $tableName;
+            }
+        }
 
         // Get the target table from an option or as a fallback from stdin.
         if (!$table = $input->getOption('table')) {
@@ -41,8 +47,6 @@ class ListSetupCommand extends ContainerAwareCommand
             return 1;
         }
 
-        $columns = $allTables[$table][TableColumnService::COLUMN_KEY];
-
         // First check if the user just wants to restore the defaults.
         if ($input->getOption('remove')) {
             $this->getContainer()->get(TableColumnService::class)->removeColumns($table);
@@ -50,10 +54,14 @@ class ListSetupCommand extends ContainerAwareCommand
             return 0;
         }
 
+        /** @var TableColumnService $tableColumnService */
+        $tableColumnService = $this->getContainer()->get(TableColumnService::class);
+        $columnDetails = $tableColumnService->getColumnDetails($table);
+
         // Print the available columns.
         $columnTable = new Table($output);
         $columnTable->setHeaders(['possible columns']);
-        foreach (array_keys($columns) as $column) {
+        foreach (array_keys($columnDetails) as $column) {
             $columnTable->addRows([[$column]]);
         }
         $columnTable->render();
@@ -72,7 +80,7 @@ class ListSetupCommand extends ContainerAwareCommand
         foreach ($userColumns as &$userColumn) {
             $userColumn = strtolower(trim($userColumn));
 
-            if (!isset($columns[$userColumn])) {
+            if (!isset($columnDetails[$userColumn])) {
                 $output->writeln('<error>Failure:</error> Column "' . $userColumn . '" not found');
                 return 1;
             }

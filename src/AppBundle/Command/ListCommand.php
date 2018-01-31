@@ -37,7 +37,13 @@ class ListCommand extends ContainerAwareCommand
 
         $helper = $this->getHelper('question');
         $allTables = $this->getContainer()->getParameter('tables');
-        $availableTables = array_keys($allTables);
+        $availableTables = [];
+
+        foreach ($allTables as $tableName => $tableDetails) {
+            if (isset($tableDetails['service']['list'])) {
+                $availableTables[] = $tableName;
+            }
+        }
 
         // Get the target table from an option or as a fallback from stdin.
         if (!$table = $input->getOption('table')) {
@@ -63,7 +69,7 @@ class ListCommand extends ContainerAwareCommand
             return 1;
         }
 
-        // Dynamically get all items.
+        // Dynamically get all arguments.
         $arguments = $input->getArgument('arguments');
         $filteredArguments = [];
 
@@ -110,7 +116,7 @@ class ListCommand extends ContainerAwareCommand
         $filteredArguments[] = $queryParams;
 
         $service = $this->getContainer()->get($serviceDetails['name']);
-        $items = call_user_func_array([$service, $serviceDetails['list']['method']], $filteredArguments);
+        $elements = call_user_func_array([$service, $serviceDetails['list']['method']], $filteredArguments);
 
         /** @var PrettyOutputService $prettyOutputService */
         $prettyOutputService = $this->getContainer()->get(PrettyOutputService::class);
@@ -120,7 +126,7 @@ class ListCommand extends ContainerAwareCommand
         $table = new Table($output);
         $table->setHeaders($availableColumns);
 
-        foreach ($items as $item) {
+        foreach ($elements as $element) {
             $row = [];
 
             foreach ($columnDetails as $column => $details) {
@@ -128,7 +134,7 @@ class ListCommand extends ContainerAwareCommand
                     $key = array_search($column, $availableColumns);
 
                     // Iterate through all methods until we have the value or a method returns null.
-                    $currentValue = $item;
+                    $currentValue = $element;
                     foreach ($details['methods'] as $method) {
                         if (is_null($currentValue)) {
                             break;
@@ -142,6 +148,8 @@ class ListCommand extends ContainerAwareCommand
                         $row[$key] = $currentValue->format(DATE_RFC822);
                     } elseif (is_bool($currentValue)) {
                         $row[$key] = $currentValue ? 'true' : 'false';
+                    } elseif (is_array($currentValue)) {
+                        $row[$key] = implode(', ', $currentValue);
                     } else {
                         $row[$key] = (string)$currentValue;
                     }

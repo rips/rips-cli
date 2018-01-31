@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\ConfigService;
 use AppBundle\Service\CredentialService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -31,6 +32,7 @@ class LoginCommand extends ContainerAwareCommand
         $loginPassword = getenv('RIPS_PASSWORD');
 
         $helper = $this->getHelper('question');
+        $configService = $this->getContainer()->get(ConfigService::class);
         $credentialService = $this->getContainer()->get(CredentialService::class);
         $api = $this->getContainer()->get('rips_connector.api');
 
@@ -80,15 +82,21 @@ class LoginCommand extends ContainerAwareCommand
                 $loginPassword = $helper->ask($input, $output, $loginPasswordQuestion);
             };
 
-            // Before the credentials are stored the user might want to check them first.
-            $api->initialize($loginUsername, $loginPassword, $settings);
-
             try {
+                // Before the credentials are stored the user might want to check them first.
+                $api->initialize($loginUsername, $loginPassword, $settings);
+
                 $output->writeln('<comment>Info:</comment> Requesting status', OutputInterface::VERBOSITY_VERBOSE);
                 $api->getStatus();
                 $output->writeln('<info>Success:</info> Authentication successful');
             } catch (ClientException $e) {
                 $output->writeln('<error>Failure:</error> Invalid credentials');
+
+                if (!$input->getOption('force')) {
+                    return 1;
+                }
+            } catch (\Exception $e) {
+                $output->writeln('<error>Failure:</error> Can\'t connect to the API');
 
                 if (!$input->getOption('force')) {
                     return 1;
@@ -99,11 +107,11 @@ class LoginCommand extends ContainerAwareCommand
                 if ($input->getOption('force')) {
                     $storeConfirmation = true;
                 } else {
-                    $storeQuestion = new ConfirmationQuestion('Do you really want to store the credentials? (y/n) ', false);
+                    $storeQuestion = new ConfirmationQuestion('Do you really want to store the credentials in ' . $configService->getFile() . '? (y/n) ', false);
                     $storeConfirmation = $helper->ask($input, $output, $storeQuestion);
                 }
                 if ($storeConfirmation) {
-                    $output->writeln('<comment>Info:</comment> Trying to store credentials', OutputInterface::VERBOSITY_VERBOSE);
+                    $output->writeln('<comment>Info:</comment> Trying to store credentials in ' . $configService->getFile(), OutputInterface::VERBOSITY_VERBOSE);
                     $credentialService->storeCredentials($loginUsername, $loginPassword, $apiUri);
                     $output->writeln('<info>Success:</info> Credentials have been stored successfully');
                 }

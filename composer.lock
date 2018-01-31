@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "c0e9b153c74edac6f4cf31e5505117be",
+    "content-hash": "cb002d6eb99d325a9f273fdceb13046b",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -1035,16 +1035,16 @@
         },
         {
             "name": "rips/connector",
-            "version": "2.9.5",
+            "version": "2.10.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rips/php-connector.git",
-                "reference": "11bd616f93f56ed3814de8550cccfacc75c866cf"
+                "reference": "6cd2c6d6ad0c212409e2000b565c70b2c14271db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rips/php-connector/zipball/11bd616f93f56ed3814de8550cccfacc75c866cf",
-                "reference": "11bd616f93f56ed3814de8550cccfacc75c866cf",
+                "url": "https://api.github.com/repos/rips/php-connector/zipball/6cd2c6d6ad0c212409e2000b565c70b2c14271db",
+                "reference": "6cd2c6d6ad0c212409e2000b565c70b2c14271db",
                 "shasum": ""
             },
             "require": {
@@ -1066,24 +1066,24 @@
                 "BSD-3-Clause"
             ],
             "description": "RIPS API connector package",
-            "time": "2017-11-20T14:40:51+00:00"
+            "time": "2018-01-31T10:48:46+00:00"
         },
         {
             "name": "rips/connector-bundle",
-            "version": "2.9.7",
+            "version": "2.10.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rips/php-connector-bundle.git",
-                "reference": "4dd38c1db0a2afc1b1fcb9f1103d4f00e5d4b084"
+                "reference": "310f9ea1f8b9ac340b924daacb76076563cf304f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rips/php-connector-bundle/zipball/4dd38c1db0a2afc1b1fcb9f1103d4f00e5d4b084",
-                "reference": "4dd38c1db0a2afc1b1fcb9f1103d4f00e5d4b084",
+                "url": "https://api.github.com/repos/rips/php-connector-bundle/zipball/310f9ea1f8b9ac340b924daacb76076563cf304f",
+                "reference": "310f9ea1f8b9ac340b924daacb76076563cf304f",
                 "shasum": ""
             },
             "require": {
-                "rips/connector": "~2.9.5"
+                "rips/connector": "~2.10.3"
             },
             "type": "symfony-bundle",
             "autoload": {
@@ -1096,7 +1096,7 @@
                 "BSD-3-Clause"
             ],
             "description": "RIPS API Connector bundle for Symfony",
-            "time": "2017-12-15T09:16:19+00:00"
+            "time": "2018-01-31T10:58:59+00:00"
         },
         {
             "name": "sensio/distribution-bundle",
@@ -1222,16 +1222,16 @@
         },
         {
             "name": "sensiolabs/security-checker",
-            "version": "v4.1.6",
+            "version": "v4.1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sensiolabs/security-checker.git",
-                "reference": "387b6a3b723ba35588b33d5f8d14e28ed608bd30"
+                "reference": "d539ccba2b4dce515de04f16b7ed7ae5b9eeb434"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sensiolabs/security-checker/zipball/387b6a3b723ba35588b33d5f8d14e28ed608bd30",
-                "reference": "387b6a3b723ba35588b33d5f8d14e28ed608bd30",
+                "url": "https://api.github.com/repos/sensiolabs/security-checker/zipball/d539ccba2b4dce515de04f16b7ed7ae5b9eeb434",
+                "reference": "d539ccba2b4dce515de04f16b7ed7ae5b9eeb434",
                 "shasum": ""
             },
             "require": {
@@ -1263,7 +1263,7 @@
                 }
             ],
             "description": "A security checker for your composer.lock",
-            "time": "2017-10-29T18:48:08+00:00"
+            "time": "2018-01-11T05:54:03+00:00"
         },
         {
             "name": "symfony/polyfill-apcu",
@@ -1607,16 +1607,16 @@
         },
         {
             "name": "symfony/symfony",
-            "version": "v3.3.14",
+            "version": "v3.3.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/symfony.git",
-                "reference": "8e2b473de636a65a018b370d5e88778a260f0e33"
+                "reference": "98e128ccee7afff6313dc3e9cce619f6e1caedbc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/symfony/zipball/8e2b473de636a65a018b370d5e88778a260f0e33",
-                "reference": "8e2b473de636a65a018b370d5e88778a260f0e33",
+                "url": "https://api.github.com/repos/symfony/symfony/zipball/98e128ccee7afff6313dc3e9cce619f6e1caedbc",
+                "reference": "98e128ccee7afff6313dc3e9cce619f6e1caedbc",
                 "shasum": ""
             },
             "require": {
@@ -1634,7 +1634,6 @@
                 "symfony/polyfill-mbstring": "~1.0",
                 "symfony/polyfill-php56": "~1.0",
                 "symfony/polyfill-php70": "~1.0",
-                "symfony/polyfill-util": "~1.0",
                 "twig/twig": "~1.34|~2.4"
             },
             "conflict": {
@@ -1757,7 +1756,7 @@
             "keywords": [
                 "framework"
             ],
-            "time": "2017-12-04T22:26:41+00:00"
+            "time": "2018-01-29T11:42:20+00:00"
         },
         {
             "name": "twig/twig",
@@ -1883,16 +1882,16 @@
         },
         {
             "name": "symfony/phpunit-bridge",
-            "version": "v3.4.2",
+            "version": "v3.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/phpunit-bridge.git",
-                "reference": "074c2e205c849a5fb37b1c24ade03cc975ac8079"
+                "reference": "6a65b09b666f975dd70ec2bb9e9b1a87dbb02aca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/074c2e205c849a5fb37b1c24ade03cc975ac8079",
-                "reference": "074c2e205c849a5fb37b1c24ade03cc975ac8079",
+                "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/6a65b09b666f975dd70ec2bb9e9b1a87dbb02aca",
+                "reference": "6a65b09b666f975dd70ec2bb9e9b1a87dbb02aca",
                 "shasum": ""
             },
             "require": {
@@ -1912,6 +1911,10 @@
             "extra": {
                 "branch-alias": {
                     "dev-master": "3.4-dev"
+                },
+                "thanks": {
+                    "name": "phpunit/phpunit",
+                    "url": "https://github.com/sebastianbergmann/phpunit"
                 }
             },
             "autoload": {
@@ -1941,7 +1944,7 @@
             ],
             "description": "Symfony PHPUnit Bridge",
             "homepage": "https://symfony.com",
-            "time": "2017-12-14T19:40:10+00:00"
+            "time": "2018-01-21T19:05:02+00:00"
         }
     ],
     "aliases": [],
@@ -1952,5 +1955,8 @@
     "platform": {
         "php": ">=5.5.9"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "platform-overrides": {
+        "php": "7.0.8"
+    }
 }

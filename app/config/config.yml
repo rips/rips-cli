@@ -115,6 +115,16 @@ parameters:
                 name: "rips_connector.applications"
                 list:
                     method: "getAll"
+                show:
+                    method: "getById"
+                    arguments:
+                        application_id:
+                            required: true
+                delete:
+                    method: "deleteById"
+                    arguments:
+                        application_id:
+                            methods: ["getId"]
         scans:
             columns:
                 id:
@@ -178,6 +188,20 @@ parameters:
                     arguments:
                         application_id:
                             required: false
+                show:
+                    method: "getById"
+                    arguments:
+                        application_id:
+                            required: true
+                        scan_id:
+                            required: true
+                delete:
+                    method: "deleteById"
+                    arguments:
+                        application_id:
+                            methods: ["getApplication", "getId"]
+                        scan_id:
+                            methods: ["getId"]
         issues:
             columns:
                 id:
@@ -299,6 +323,9 @@ parameters:
                 source_parameter:
                     methods: ["getSource", "getParameter"]
                     default: true
+                cve:
+                    methods: ["getCve"]
+                    default: true
             service:
                 name: "rips_connector.application.scan.issues"
                 list:
@@ -308,6 +335,86 @@ parameters:
                             required: true
                         scan_id:
                             required: true
+        uploads:
+            columns:
+                id:
+                    methods: ["getId"]
+                    default: true
+                submission:
+                    methods: ["getSubmission"]
+                    default: true
+                name:
+                    methods: ["getName"]
+                    default: true
+                extension:
+                    methods: ["getExtension"]
+                size:
+                    methods: ["getSize"]
+                    default: true
+                file:
+                    methods: ["getFile"]
+                created_by_id:
+                    methods: ["getCreatedBy", "getId"]
+                created_by_username:
+                    methods: ["getCreatedBy", "getUsername"]
+                    default: true
+                created_by_firstname:
+                    methods: ["getCreatedBy", "getFirstname"]
+                created_by_lastname:
+                    methods: ["getCreatedBy", "getLastname"]
+            service:
+                name: "rips_connector.application.uploads"
+                list:
+                    method: "getAll"
+                    arguments:
+                        application_id:
+                            required: true
+                show:
+                    method: "getById"
+                    arguments:
+                        application_id:
+                            required: true
+                        upload_id:
+                            required: true
+                delete:
+                    method: "deleteById"
+                    arguments:
+                        application_id:
+                            methods: ["getApplication", "getId"]
+                        upload_id:
+                            methods: ["getId"]
+        customs:
+            columns:
+                id:
+                    methods: ["getId"]
+                    default: true
+                name:
+                    methods: ["getName"]
+                    default: true
+                global:
+                    methods: ["getGlobal"]
+                    default: true
+            service:
+                name: "rips_connector.application.customs"
+                list:
+                    method: "getAll"
+                    arguments:
+                        application_id:
+                            required: false
+                show:
+                    method: "getById"
+                    arguments:
+                        application_id:
+                            required: true
+                        custom_id:
+                            required: true
+                delete:
+                    method: "deleteById"
+                    arguments:
+                        application_id:
+                            methods: ["getApplication", "getId"]
+                        custom_id:
+                            methods: ["getId"]
         quotas:
             columns:
                 id:
@@ -344,24 +451,79 @@ parameters:
                 name: "rips_connector.quotas"
                 list:
                     method: "getAll"
-        uploads:
+        users:
             columns:
                 id:
                     methods: ["getId"]
                     default: true
-                submission:
-                    methods: ["getSubmission"]
+                username:
+                    methods: ["getUsername"]
+                    default: true
+                email:
+                    methods: ["getEmail"]
+                    default: true
+                firstname:
+                    methods: ["getFirstname"]
+                    default: true
+                lastname:
+                    methods: ["getLastname"]
+                    default: true
+                valid_until:
+                    methods: ["getValidUntil"]
+                roles:
+                    methods: ["getRoles"]
+                    default: true
+                root:
+                    methods: ["getRoot"]
+                    default: true
+                whitelisted_ips:
+                    methods: ["getWhitelistedIps"]
+                callbacks:
+                    methods: ["getCallbacks"]
+            service:
+                name: "rips_connector.users"
+                list:
+                    method: "getAll"
+                show:
+                    method: "getById"
+                    arguments:
+                        user_id:
+                            required: true
+                delete:
+                    method: "deleteById"
+                    arguments:
+                        user_id:
+                            methods: ["getId"]
+        teams:
+            columns:
+                id:
+                    methods: ["getId"]
                     default: true
                 name:
                     methods: ["getName"]
                     default: true
-                extension:
-                    methods: ["getExtension"]
-                size:
-                    methods: ["getSize"]
+            service:
+                name: "rips_connector.teams"
+                list:
+                    method: "getAll"
+                show:
+                    method: "getById"
+                    arguments:
+                        team_id:
+                            required: true
+                delete:
+                    method: "deleteById"
+                    arguments:
+                        team_id:
+                            methods: ["getId"]
+        activities:
+            columns:
+                id:
+                    methods: ["getId"]
                     default: true
-                file:
-                    methods: ["getFile"]
+                type:
+                    methods: ["getType"]
+                    default: true
                 created_by_id:
                     methods: ["getCreatedBy", "getId"]
                 created_by_username:
@@ -371,31 +533,49 @@ parameters:
                     methods: ["getCreatedBy", "getFirstname"]
                 created_by_lastname:
                     methods: ["getCreatedBy", "getLastname"]
+                application_id:
+                    methods: ["getApplication", "getId"]
+                    default: true
+                application_name:
+                    methods: ["getApplication", "getName"]
+                    default: true
+                created_at:
+                    methods: ["getCreatedAt"]
+                    default: true
             service:
-                name: "rips_connector.application.uploads"
+                name: "rips_connector.activities"
                 list:
                     method: "getAll"
+                show:
+                    method: "getById"
                     arguments:
-                        application_id:
+                        activity_id:
                             required: true
-        customs:
+        settings:
             columns:
-                id:
-                    methods: ["getId"]
+                key:
+                    methods: ["getKey"]
                     default: true
-                name:
-                    methods: ["getName"]
+                value:
+                    methods: ["getValue"]
                     default: true
-                global:
-                    methods: ["getGlobal"]
+                created_at:
+                    methods: ["getCreatedAt"]
                     default: true
             service:
-                name: "rips_connector.application.customs"
+                name: "rips_connector.settings"
                 list:
                     method: "getAll"
+                show:
+                    method: "getByKey"
                     arguments:
-                        application_id:
-                            required: false
+                        setting_key:
+                            required: true
+                delete:
+                    method: "deleteByKey"
+                    arguments:
+                        setting_key:
+                            methods: ["getKey"]
 
 framework:
     secret: ''
