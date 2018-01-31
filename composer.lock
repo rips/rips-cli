@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "d5d61e2e90804ce897c01461ac18643c",
+    "content-hash": "cb002d6eb99d325a9f273fdceb13046b",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -1035,16 +1035,16 @@
         },
         {
             "name": "rips/connector",
-            "version": "2.10.2",
+            "version": "2.10.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rips/php-connector.git",
-                "reference": "2fc8a06e4f6fa5aa4d7a9930b0a4f36e44535fde"
+                "reference": "6cd2c6d6ad0c212409e2000b565c70b2c14271db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rips/php-connector/zipball/2fc8a06e4f6fa5aa4d7a9930b0a4f36e44535fde",
-                "reference": "2fc8a06e4f6fa5aa4d7a9930b0a4f36e44535fde",
+                "url": "https://api.github.com/repos/rips/php-connector/zipball/6cd2c6d6ad0c212409e2000b565c70b2c14271db",
+                "reference": "6cd2c6d6ad0c212409e2000b565c70b2c14271db",
                 "shasum": ""
             },
             "require": {
@@ -1066,24 +1066,24 @@
                 "BSD-3-Clause"
             ],
             "description": "RIPS API connector package",
-            "time": "2018-01-30T11:40:14+00:00"
+            "time": "2018-01-31T10:48:46+00:00"
         },
         {
             "name": "rips/connector-bundle",
-            "version": "2.10.2",
+            "version": "2.10.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rips/php-connector-bundle.git",
-                "reference": "1dc9a7efb3b63a6a13de793066e9f1c2bfc28386"
+                "reference": "310f9ea1f8b9ac340b924daacb76076563cf304f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rips/php-connector-bundle/zipball/1dc9a7efb3b63a6a13de793066e9f1c2bfc28386",
-                "reference": "1dc9a7efb3b63a6a13de793066e9f1c2bfc28386",
+                "url": "https://api.github.com/repos/rips/php-connector-bundle/zipball/310f9ea1f8b9ac340b924daacb76076563cf304f",
+                "reference": "310f9ea1f8b9ac340b924daacb76076563cf304f",
                 "shasum": ""
             },
             "require": {
-                "rips/connector": "~2.10.2"
+                "rips/connector": "~2.10.3"
             },
             "type": "symfony-bundle",
             "autoload": {
@@ -1096,7 +1096,7 @@
                 "BSD-3-Clause"
             ],
             "description": "RIPS API Connector bundle for Symfony",
-            "time": "2018-01-30T11:53:19+00:00"
+            "time": "2018-01-31T10:58:59+00:00"
         },
         {
             "name": "sensio/distribution-bundle",
