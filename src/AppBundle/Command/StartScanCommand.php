@@ -183,7 +183,7 @@ class StartScanCommand extends ContainerAwareCommand
 
         // Wait for scan to finish if user wants an exit code based on the results.
         $thresholds = $input->getOption('threshold');
-        if (!is_null($thresholds)) {
+        if ($thresholds) {
             $output->writeln('<comment>Info:</comment> Waiting for scan "' . $scan->getVersion() . '" (' . $scan->getId() . ') to finish', OutputInterface::VERBOSITY_VERBOSE);
             $scan = $scanService->blockUntilDone($applicationId, $scan->getId(), 0, 5, [
                 'issueNegativelyReviewed' => 0,
