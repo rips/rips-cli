@@ -35,6 +35,7 @@ class StartScanCommand extends ContainerAwareCommand
             ->addOption('parent', 'P', InputOption::VALUE_REQUIRED, 'Set parent scan id')
             ->addOption('tag', 'T', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Add tags')
             ->addOption('env-file', 'F', InputOption::VALUE_REQUIRED, 'Load environment from file')
+            ->addOption('remove-code', 'R', InputOption::VALUE_NONE, 'Remove source code from RIPS once analysis is finished')
         ;
     }
 
@@ -87,6 +88,10 @@ class StartScanCommand extends ContainerAwareCommand
 
         if (!$input->getOption('keep-upload')) {
             $scanInput['uploadRemoved'] = true;
+        }
+
+        if ($input->getOption('remove-code')) {
+            $scanInput['codeStored'] = false;
         }
 
         if ($customId = $input->getOption('custom')) {
