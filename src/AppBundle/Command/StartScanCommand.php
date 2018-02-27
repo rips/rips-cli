@@ -36,6 +36,7 @@ class StartScanCommand extends ContainerAwareCommand
             ->addOption('tag', 'T', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Add tags')
             ->addOption('env-file', 'F', InputOption::VALUE_REQUIRED, 'Load environment from file')
             ->addOption('remove-code', 'R', InputOption::VALUE_NONE, 'Remove source code from RIPS once analysis is finished')
+            ->addOption('issue-type', 'I', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Override the issue types')
         ;
     }
 
@@ -100,6 +101,10 @@ class StartScanCommand extends ContainerAwareCommand
 
         if ($parentId = $input->getOption('parent')) {
             $scanInput['parent'] = $parentId;
+        }
+
+        if ($issueTypes = $input->getOption('issue-type')) {
+            $scanInput['issueTypes'] = $issueTypes;
         }
 
         if ($uploadId = $input->getOption('upload')) {
