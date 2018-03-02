@@ -151,6 +151,8 @@ class StartScanCommand extends ContainerAwareCommand
                 $output->writeln('<comment>Info:</comment> Starting upload of archive "' . $archivePath . '"', OutputInterface::VERBOSITY_VERBOSE);
                 $upload = $uploadService->create($applicationId, $archiveName, $archivePath);
                 $output->writeln('<info>Success:</info> Archive "' . $archiveName . '" (' . $upload->getId() . ') was successfully uploaded');
+            } catch (\Exception $e) {
+                return 1;
             } finally {
                 if ($removeZip) {
                     $fs = new Filesystem();
