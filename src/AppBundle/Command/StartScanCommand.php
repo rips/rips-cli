@@ -123,6 +123,14 @@ class StartScanCommand extends ContainerAwareCommand
 
             // Make sure that we have a supported archive.
             $archiveService = $this->getContainer()->get(ArchiveService::class);
+
+            // Use file extensions from API if it provides them. Otherwise fall back to the internal ones (RCLI-61).
+            $statusService = $this->getContainer()->get('rips_connector.api');
+            $status = $statusService->getStatus();
+            if ($status->getFileExtensions()) {
+                $archiveService->setFileExtensions($status->getFileExtensions());
+            }
+
             if (!$archiveService->isArchive($path)) {
                 $output->writeln('<comment>Info:</comment> Packing folder "' . $realPath . '"', OutputInterface::VERBOSITY_VERBOSE);
                 $archivePath = $archiveService->folderToArchive($realPath, $input->getOption('exclude-path'));
