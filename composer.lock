@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "c546a41b51aeeff7ce2e7d982bbd4f97",
+    "content-hash": "caad050ae01d5342be8fd1e11d88a8fa",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -1070,17 +1070,11 @@
         },
         {
             "name": "rips/connector-bundle",
-            "version": "2.12.0",
+            "version": "dev-dev",
             "source": {
                 "type": "git",
-                "url": "https://github.com/rips/php-connector-bundle.git",
-                "reference": "e4192ac112d4b587df6514f91d1d8c09c138e1f8"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/rips/php-connector-bundle/zipball/e4192ac112d4b587df6514f91d1d8c09c138e1f8",
-                "reference": "e4192ac112d4b587df6514f91d1d8c09c138e1f8",
-                "shasum": ""
+                "url": "https://source.internal.ripstech.com/scm/rac/php-connector-bundle.git",
+                "reference": "b2e292647d49b7bbbc45d3404c48fb2dfa2f1539"
             },
             "require": {
                 "rips/connector": "~2.12.0"
@@ -1091,12 +1085,11 @@
                     "RIPS\\ConnectorBundle\\": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
             "description": "RIPS API Connector bundle for Symfony",
-            "time": "2018-02-27T14:49:41+00:00"
+            "time": "2018-03-02T14:23:52+00:00"
         },
         {
             "name": "sensio/distribution-bundle",
@@ -1222,16 +1215,16 @@
         },
         {
             "name": "sensiolabs/security-checker",
-            "version": "v4.1.7",
+            "version": "v4.1.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sensiolabs/security-checker.git",
-                "reference": "d539ccba2b4dce515de04f16b7ed7ae5b9eeb434"
+                "reference": "dc270d5fec418cc6ac983671dba5d80ffaffb142"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sensiolabs/security-checker/zipball/d539ccba2b4dce515de04f16b7ed7ae5b9eeb434",
-                "reference": "d539ccba2b4dce515de04f16b7ed7ae5b9eeb434",
+                "url": "https://api.github.com/repos/sensiolabs/security-checker/zipball/dc270d5fec418cc6ac983671dba5d80ffaffb142",
+                "reference": "dc270d5fec418cc6ac983671dba5d80ffaffb142",
                 "shasum": ""
             },
             "require": {
@@ -1263,7 +1256,7 @@
                 }
             ],
             "description": "A security checker for your composer.lock",
-            "time": "2018-01-11T05:54:03+00:00"
+            "time": "2018-02-28T22:10:01+00:00"
         },
         {
             "name": "symfony/polyfill-apcu",
@@ -1882,16 +1875,16 @@
         },
         {
             "name": "symfony/phpunit-bridge",
-            "version": "v3.4.4",
+            "version": "v3.4.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/phpunit-bridge.git",
-                "reference": "6a65b09b666f975dd70ec2bb9e9b1a87dbb02aca"
+                "reference": "32b06d2b0babf3216e55acfce42249321a304f03"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/6a65b09b666f975dd70ec2bb9e9b1a87dbb02aca",
-                "reference": "6a65b09b666f975dd70ec2bb9e9b1a87dbb02aca",
+                "url": "https://api.github.com/repos/symfony/phpunit-bridge/zipball/32b06d2b0babf3216e55acfce42249321a304f03",
+                "reference": "32b06d2b0babf3216e55acfce42249321a304f03",
                 "shasum": ""
             },
             "require": {
@@ -1944,12 +1937,14 @@
             ],
             "description": "Symfony PHPUnit Bridge",
             "homepage": "https://symfony.com",
-            "time": "2018-01-21T19:05:02+00:00"
+            "time": "2018-02-14T23:24:28+00:00"
         }
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "rips/connector-bundle": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
