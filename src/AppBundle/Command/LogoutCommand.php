@@ -33,6 +33,7 @@ class LogoutCommand extends ContainerAwareCommand
         }
 
         $output->writeln('<comment>Info:</comment> Trying to remove credentials', OutputInterface::VERBOSITY_VERBOSE);
+        /** @var CredentialService $credentialService */
         $credentialService = $this->getContainer()->get(CredentialService::class);
         $credentialService->removeCredentials();
         $output->writeln('<info>Success:</info> Logout successful');

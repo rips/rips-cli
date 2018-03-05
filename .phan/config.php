@@ -39,6 +39,7 @@ return [
     //       to `exclude_analysis_directory_list`.
     "exclude_analysis_directory_list" => [
         'vendor/',
+        'src/AppBundle/Command/Cache/',
     ],
 
     // The minimum severity level to report on. This can be
@@ -64,7 +65,7 @@ return [
     // Add any issue types (such as 'PhanUndeclaredMethod')
     // to this black-list to inhibit them from being reported.
     'suppress_issue_types' => [
-        'PhanUndeclaredMethod',
+        'PhanUnreferencedUseNormal'
     ],
 
     // A list of plugin files to execute.
