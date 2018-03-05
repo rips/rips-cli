@@ -47,15 +47,16 @@ class ListSetupCommand extends ContainerAwareCommand
             return 1;
         }
 
+        /** @var TableColumnService $tableColumnService */
+        $tableColumnService = $this->getContainer()->get(TableColumnService::class);
+
         // First check if the user just wants to restore the defaults.
         if ($input->getOption('remove')) {
-            $this->getContainer()->get(TableColumnService::class)->removeColumns($table);
+            $tableColumnService->removeColumns($table);
             $output->writeln('<info>Success:</info> Removed table "' . $table . '" from config');
             return 0;
         }
 
-        /** @var TableColumnService $tableColumnService */
-        $tableColumnService = $this->getContainer()->get(TableColumnService::class);
         $columnDetails = $tableColumnService->getColumnDetails($table);
 
         // Print the available columns.
@@ -89,7 +90,7 @@ class ListSetupCommand extends ContainerAwareCommand
         $userColumns = array_unique($userColumns);
 
         // Store columns in config.
-        $this->getContainer()->get(TableColumnService::class)->storeColumns($table, $userColumns);
+        $tableColumnService->storeColumns($table, $userColumns);
 
         return 0;
     }

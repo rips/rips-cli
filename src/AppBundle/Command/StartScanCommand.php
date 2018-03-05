@@ -14,6 +14,9 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Question\Question;
 use AppBundle\Service\ArchiveService;
 use AppBundle\Service\EnvService;
+use RIPS\ConnectorBundle\Services\APIService;
+use RIPS\ConnectorBundle\Services\Application\ScanService;
+use RIPS\ConnectorBundle\Services\Application\UploadService;
 
 class StartScanCommand extends ContainerAwareCommand
 {
@@ -122,9 +125,11 @@ class StartScanCommand extends ContainerAwareCommand
             }
 
             // Make sure that we have a supported archive.
+            /** @var ArchiveService $archiveService */
             $archiveService = $this->getContainer()->get(ArchiveService::class);
 
             // Use file extensions from API if it provides them. Otherwise fall back to the internal ones (RCLI-61).
+            /** @var APIService $statusService */
             $statusService = $this->getContainer()->get('rips_connector.api');
             $status = $statusService->getStatus();
             if ($status->getFileExtensions()) {
@@ -144,13 +149,15 @@ class StartScanCommand extends ContainerAwareCommand
             }
 
             // Upload the archive.
-            /** @var \RIPS\ConnectorBundle\Services\Application\UploadService $uploadService */
+            /** @var UploadService $uploadService */
             $uploadService = $this->getContainer()->get('rips_connector.application.uploads');
 
             try {
                 $output->writeln('<comment>Info:</comment> Starting upload of archive "' . $archivePath . '"', OutputInterface::VERBOSITY_VERBOSE);
                 $upload = $uploadService->create($applicationId, $archiveName, $archivePath);
                 $output->writeln('<info>Success:</info> Archive "' . $archiveName . '" (' . $upload->getId() . ') was successfully uploaded');
+            } catch (\Exception $e) {
+                return 1;
             } finally {
                 if ($removeZip) {
                     $fs = new Filesystem();
@@ -174,6 +181,7 @@ class StartScanCommand extends ContainerAwareCommand
 
         if ($input->getOption('env-file')) {
             $output->writeln('<comment>Info:</comment> Using env from ' . $input->getOption('env-file'), OutputInterface::VERBOSITY_VERBOSE);
+            /** @var EnvService $envService */
             $envService = $this->getContainer()->get(EnvService::class);
             try {
                 $arrayInput['php'] = new PhpBuilder($envService->loadEnvFromFile('php', $input->getOption('env-file')));
@@ -188,7 +196,7 @@ class StartScanCommand extends ContainerAwareCommand
             $arrayInput['tags'] = new TagBuilder($input->getOption('tag'));
         }
 
-        /** @var \RIPS\ConnectorBundle\Services\Application\ScanService $scanService */
+        /** @var ScanService $scanService */
         $scanService = $this->getContainer()->get('rips_connector.application.scans');
 
         $output->writeln('<comment>Info:</comment> Trying to start scan "' . $version . '"', OutputInterface::VERBOSITY_VERBOSE);

@@ -38,7 +38,7 @@ class ConfigService
     public function loadConfig()
     {
         // First try to read the config from memory.
-        if (isset($this->config) && !is_null($this->config)) {
+        if (isset($this->config) && $this->config) {
             return $this->config;
         }
 

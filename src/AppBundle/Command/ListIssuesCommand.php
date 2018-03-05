@@ -3,7 +3,6 @@
 namespace AppBundle\Command;
 
 use AppBundle\Service\PrettyOutputService;
-use RIPS\ConnectorBundle\Entities\Application\ScanEntity;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;

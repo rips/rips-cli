@@ -1,0 +1,5 @@
+parameters:
+	excludes_analyse:
+		- src/AppBundle/Command/Cache/CacheClearCommand.php
+		- src/AppBundle/Command/Cache/CachePoolClearCommand.php
+		- src/AppBundle/Command/Cache/CacheWarmupCommand.php
