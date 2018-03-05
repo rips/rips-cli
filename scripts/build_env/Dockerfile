@@ -30,3 +30,5 @@ RUN \
 USER root
 RUN useradd -m oscar -u 999
 USER oscar
+
+CMD ["bash", "-i"]
