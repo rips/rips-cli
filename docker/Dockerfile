@@ -15,3 +15,5 @@ RUN chown root:root /usr/bin/rips-cli && chmod 755 /usr/bin/rips-cli
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s /usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
 ENTRYPOINT ["docker-entrypoint.sh"]
+
+CMD ["-h"]
