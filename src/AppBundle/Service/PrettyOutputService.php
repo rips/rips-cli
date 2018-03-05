@@ -17,4 +17,21 @@ class PrettyOutputService
             return $input;
         }
     }
+
+    /**
+     * @param mixed $input
+     * @return string
+     */
+    public function toString($input)
+    {
+        if ($input instanceof \DateTime) {
+            return $input->format(DATE_RFC822);
+        } elseif (is_bool($input)) {
+            return ($input ? 'true' : 'false');
+        } elseif (is_array($input)) {
+            return implode(', ', $input);
+        } else {
+            return (string)$input;
+        }
+    }
 }
