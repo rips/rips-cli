@@ -14,4 +14,4 @@ composer install --dev --no-interaction
 ./bin/console security:check
 ./vendor/bin/phpcs --standard=PSR1,PSR2 -n src
 ./vendor/bin/phpstan analyse -c .phpstan.neon -l 7 src
-PHAN_DISABLE_XDEBUG_WARN=1 ./vendor/bin/phan
+PHAN_DISABLE_XDEBUG_WARN=1 ./vendor/bin/phan -k .phan.php
