@@ -26,8 +26,13 @@ RUN \
   HOME="/tmp" php composer-setup.php && \
   php -r "unlink('composer-setup.php');"
 
-# Drop privileges to "bamboo" user.
 USER root
+RUN \
+  chown root:root composer.phar && \
+  chmod 755 composer.phar && \
+  mv composer.phar /usr/bin/composer
+
+# Drop privileges to "bamboo" user.
 RUN useradd -m oscar -u 999
 USER oscar
 
