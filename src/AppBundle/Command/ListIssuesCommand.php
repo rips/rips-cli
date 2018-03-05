@@ -113,17 +113,7 @@ class ListIssuesCommand extends ContainerAwareCommand
                             $currentValue = call_user_func([$currentValue, $method]);
                         }
 
-                        // Get value as string. Format it if necessary.
-                        if ($currentValue instanceof \DateTime) {
-                            $row[$key] = $currentValue->format(DATE_RFC822);
-                        } elseif (is_bool($currentValue)) {
-                            $row[$key] = $currentValue ? 'true' : 'false';
-                        } elseif (is_array($currentValue)) {
-                            $row[$key] = implode(', ', $currentValue);
-                        } else {
-                            $row[$key] = (string)$currentValue;
-                        }
-
+                        $row[$key] = $prettyOutputService->toString($currentValue);
                         $row[$key] = $prettyOutputService->shortenString($row[$key], $maxChars);
                     }
                 }
