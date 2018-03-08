@@ -103,7 +103,7 @@ class LoginCommand extends ContainerAwareCommand
                     return 1;
                 }
             } catch (\Exception $e) {
-                $output->writeln('<error>Failure:</error> Can\'t connect to the API');
+                $output->writeln('<error>Failure:</error> Can\'t connect to the API => ' . $e->getMessage());
 
                 if (!$input->getOption('force')) {
                     return 1;
