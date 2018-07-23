@@ -34,11 +34,13 @@ class StartScanCommand extends ContainerAwareCommand
             ->addOption('local', 'l', InputOption::VALUE_NONE, 'Set to true if you want to start a scan by local path')
             ->addOption('quota', 'Q', InputOption::VALUE_REQUIRED, 'Set quota id')
             ->addOption('custom', 'C', InputOption::VALUE_REQUIRED, 'Set custom id (analysis profile)')
+            ->addOption('remove-upload', 'k', InputOption::VALUE_NONE, 'Remove upload after scan is finished')
             ->addOption('keep-upload', 'K', InputOption::VALUE_NONE, 'Do not remove upload after scan is finished')
             ->addOption('parent', 'P', InputOption::VALUE_REQUIRED, 'Set parent scan id')
             ->addOption('tag', 'T', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Add tags')
             ->addOption('env-file', 'F', InputOption::VALUE_REQUIRED, 'Load environment from file')
             ->addOption('remove-code', 'R', InputOption::VALUE_NONE, 'Remove source code from RIPS once analysis is finished')
+            ->addOption('keep-code', 'r', InputOption::VALUE_NONE, 'Keep source code in RIPS once analysis is finished')
             ->addOption('issue-type', 'I', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Override the issue types')
         ;
     }
@@ -59,6 +61,12 @@ class StartScanCommand extends ContainerAwareCommand
             return 1;
         } elseif (!$input->getOption('path') && $input->getOption('exclude-path')) {
             $output->writeln('<error>Failure:</error> Exclude-path requires path');
+            return 1;
+        } elseif ($input->getOption('remove-code') && $input->getOption('keep-code')) {
+            $output->writeln('<error>Failure:</error> Remove-code and keep-code are not compatible');
+            return 1;
+        } elseif ($input->getOption('remove-upload') && $input->getOption('keep-upload')) {
+            $output->writeln('<error>Failure:</error> Remove-upload and keep-upload are not compatible');
             return 1;
         }
 
@@ -90,12 +98,16 @@ class StartScanCommand extends ContainerAwareCommand
             'version' => $version
         ];
 
-        if (!$input->getOption('keep-upload')) {
+        if ($input->getOption('remove-upload')) {
             $scanInput['uploadRemoved'] = true;
+        } else if ($input->getOption('keep-upload')) {
+            $scanInput['uploadRemoved'] = false;
         }
 
         if ($input->getOption('remove-code')) {
             $scanInput['codeStored'] = false;
+        } else if ($input->getOption('keep-code')) {
+            $scanInput['codeStored'] = true;
         }
 
         if ($customId = $input->getOption('custom')) {
