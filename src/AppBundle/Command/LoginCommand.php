@@ -10,7 +10,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\HttpKernel\KernelInterface;
 use RIPS\Connector\Exceptions\ClientException;
+use RIPS\ConnectorBundle\Services\APIService;
 
 class LoginCommand extends ContainerAwareCommand
 {
@@ -32,15 +34,20 @@ class LoginCommand extends ContainerAwareCommand
         $loginPassword = getenv('RIPS_PASSWORD');
 
         $helper = $this->getHelper('question');
+        /** @var ConfigService $configService */
         $configService = $this->getContainer()->get(ConfigService::class);
+        /** @var CredentialService $credentialService */
         $credentialService = $this->getContainer()->get(CredentialService::class);
+        /** @var APIService $api */
         $api = $this->getContainer()->get('rips_connector.api');
 
         // Windows does not have ca CA bundle, so we have to hard code one.
         $settings = [];
 
         if (stristr(PHP_OS, 'WIN')) {
-            $settings['verify'] = realpath($this->getContainer()->get('kernel')->getRootDir() . '/Resources/cacert.pem');
+            /** @var KernelInterface $kernel */
+            $kernel = $this->getContainer()->get('kernel');
+            $settings['verify'] = realpath($kernel->getRootDir() . '/Resources/cacert.pem');
         }
 
         if ($input->getOption('config') && $credentialService->hasCredentials()) {
@@ -97,6 +104,14 @@ class LoginCommand extends ContainerAwareCommand
                 }
             } catch (\Exception $e) {
                 $output->writeln('<error>Failure:</error> Can\'t connect to the API');
+                $output->writeln($e->getMessage(), OutputInterface::VERBOSITY_VERBOSE);
+
+                if (!$input->getOption('force')) {
+                    return 1;
+                }
+            } catch (\Throwable $e) {
+                $output->writeln('<error>Failure:</error> The API is not compatible');
+                $output->writeln($e->getMessage(), OutputInterface::VERBOSITY_VERBOSE);
 
                 if (!$input->getOption('force')) {
                     return 1;

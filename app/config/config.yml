@@ -7,7 +7,8 @@ parameters:
     env(HOME): '.'
     env(RIPS_CONFIG): '%env(HOME)%/.rips.yml'
     default_api_url: 'https://api-2.ripstech.com'
-    file_extensions: ["php", "inc", "phps", "php3", "php4", "php5", "phtml", "tpl", "cgi", "module"]
+    file_extensions: ["php", "inc", "phps", "php3", "php4", "php5", "phtml", "tpl", "cgi", "module", "ctp", "twig",
+                      "yml", "yaml", "ini", "json", "neon", "xml", "htaccess", "env"]
     archive_extensions: ["zip", "gz", "bz2"]
 
     export_types:

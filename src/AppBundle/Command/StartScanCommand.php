@@ -14,6 +14,9 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Question\Question;
 use AppBundle\Service\ArchiveService;
 use AppBundle\Service\EnvService;
+use RIPS\ConnectorBundle\Services\APIService;
+use RIPS\ConnectorBundle\Services\Application\ScanService;
+use RIPS\ConnectorBundle\Services\Application\UploadService;
 
 class StartScanCommand extends ContainerAwareCommand
 {
@@ -31,10 +34,14 @@ class StartScanCommand extends ContainerAwareCommand
             ->addOption('local', 'l', InputOption::VALUE_NONE, 'Set to true if you want to start a scan by local path')
             ->addOption('quota', 'Q', InputOption::VALUE_REQUIRED, 'Set quota id')
             ->addOption('custom', 'C', InputOption::VALUE_REQUIRED, 'Set custom id (analysis profile)')
+            ->addOption('remove-upload', 'k', InputOption::VALUE_NONE, 'Remove upload after scan is finished')
             ->addOption('keep-upload', 'K', InputOption::VALUE_NONE, 'Do not remove upload after scan is finished')
             ->addOption('parent', 'P', InputOption::VALUE_REQUIRED, 'Set parent scan id')
             ->addOption('tag', 'T', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Add tags')
             ->addOption('env-file', 'F', InputOption::VALUE_REQUIRED, 'Load environment from file')
+            ->addOption('remove-code', 'R', InputOption::VALUE_NONE, 'Remove source code from RIPS once analysis is finished')
+            ->addOption('keep-code', 'r', InputOption::VALUE_NONE, 'Keep source code in RIPS once analysis is finished')
+            ->addOption('issue-type', 'I', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Override the issue types')
         ;
     }
 
@@ -54,6 +61,12 @@ class StartScanCommand extends ContainerAwareCommand
             return 1;
         } elseif (!$input->getOption('path') && $input->getOption('exclude-path')) {
             $output->writeln('<error>Failure:</error> Exclude-path requires path');
+            return 1;
+        } elseif ($input->getOption('remove-code') && $input->getOption('keep-code')) {
+            $output->writeln('<error>Failure:</error> Remove-code and keep-code are not compatible');
+            return 1;
+        } elseif ($input->getOption('remove-upload') && $input->getOption('keep-upload')) {
+            $output->writeln('<error>Failure:</error> Remove-upload and keep-upload are not compatible');
             return 1;
         }
 
@@ -85,8 +98,16 @@ class StartScanCommand extends ContainerAwareCommand
             'version' => $version
         ];
 
-        if (!$input->getOption('keep-upload')) {
+        if ($input->getOption('remove-upload')) {
             $scanInput['uploadRemoved'] = true;
+        } else if ($input->getOption('keep-upload')) {
+            $scanInput['uploadRemoved'] = false;
+        }
+
+        if ($input->getOption('remove-code')) {
+            $scanInput['codeStored'] = false;
+        } else if ($input->getOption('keep-code')) {
+            $scanInput['codeStored'] = true;
         }
 
         if ($customId = $input->getOption('custom')) {
@@ -95,6 +116,10 @@ class StartScanCommand extends ContainerAwareCommand
 
         if ($parentId = $input->getOption('parent')) {
             $scanInput['parent'] = $parentId;
+        }
+
+        if ($issueTypes = $input->getOption('issue-type')) {
+            $scanInput['issueTypes'] = $issueTypes;
         }
 
         if ($uploadId = $input->getOption('upload')) {
@@ -112,7 +137,17 @@ class StartScanCommand extends ContainerAwareCommand
             }
 
             // Make sure that we have a supported archive.
+            /** @var ArchiveService $archiveService */
             $archiveService = $this->getContainer()->get(ArchiveService::class);
+
+            // Use file extensions from API if it provides them. Otherwise fall back to the internal ones (RCLI-61).
+            /** @var APIService $statusService */
+            $statusService = $this->getContainer()->get('rips_connector.api');
+            $status = $statusService->getStatus();
+            if ($status->getFileExtensions()) {
+                $archiveService->setFileExtensions($status->getFileExtensions());
+            }
+
             if (!$archiveService->isArchive($path)) {
                 $output->writeln('<comment>Info:</comment> Packing folder "' . $realPath . '"', OutputInterface::VERBOSITY_VERBOSE);
                 $archivePath = $archiveService->folderToArchive($realPath, $input->getOption('exclude-path'));
@@ -126,13 +161,15 @@ class StartScanCommand extends ContainerAwareCommand
             }
 
             // Upload the archive.
-            /** @var \RIPS\ConnectorBundle\Services\Application\UploadService $uploadService */
+            /** @var UploadService $uploadService */
             $uploadService = $this->getContainer()->get('rips_connector.application.uploads');
 
             try {
                 $output->writeln('<comment>Info:</comment> Starting upload of archive "' . $archivePath . '"', OutputInterface::VERBOSITY_VERBOSE);
                 $upload = $uploadService->create($applicationId, $archiveName, $archivePath);
                 $output->writeln('<info>Success:</info> Archive "' . $archiveName . '" (' . $upload->getId() . ') was successfully uploaded');
+            } catch (\Exception $e) {
+                return 1;
             } finally {
                 if ($removeZip) {
                     $fs = new Filesystem();
@@ -156,6 +193,7 @@ class StartScanCommand extends ContainerAwareCommand
 
         if ($input->getOption('env-file')) {
             $output->writeln('<comment>Info:</comment> Using env from ' . $input->getOption('env-file'), OutputInterface::VERBOSITY_VERBOSE);
+            /** @var EnvService $envService */
             $envService = $this->getContainer()->get(EnvService::class);
             try {
                 $arrayInput['php'] = new PhpBuilder($envService->loadEnvFromFile('php', $input->getOption('env-file')));
@@ -170,7 +208,7 @@ class StartScanCommand extends ContainerAwareCommand
             $arrayInput['tags'] = new TagBuilder($input->getOption('tag'));
         }
 
-        /** @var \RIPS\ConnectorBundle\Services\Application\ScanService $scanService */
+        /** @var ScanService $scanService */
         $scanService = $this->getContainer()->get('rips_connector.application.scans');
 
         $output->writeln('<comment>Info:</comment> Trying to start scan "' . $version . '"', OutputInterface::VERBOSITY_VERBOSE);
