@@ -1,5 +1,6 @@
 # Pull base image.
-FROM ubuntu:17.10
+FROM ubuntu:18.04
+ENV DEBIAN_FRONTEND noninteractive
 
 # Upgrade system.
 RUN \
@@ -12,7 +13,7 @@ RUN \
 
 # Install PHP extensions that are not available through APT.
 RUN pecl install ast
-COPY configs/20-ast.ini /etc/php/7.1/cli/conf.d/20-ast.ini
+COPY configs/20-ast.ini /etc/php/7.2/cli/conf.d/20-ast.ini
 
 # Install NodeJS/NPM.
 RUN \
