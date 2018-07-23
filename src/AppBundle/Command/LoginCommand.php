@@ -103,7 +103,15 @@ class LoginCommand extends ContainerAwareCommand
                     return 1;
                 }
             } catch (\Exception $e) {
-                $output->writeln('<error>Failure:</error> Can\'t connect to the API => ' . $e->getMessage());
+                $output->writeln('<error>Failure:</error> Can\'t connect to the API');
+                $output->writeln($e->getMessage(), OutputInterface::VERBOSITY_VERBOSE);
+
+                if (!$input->getOption('force')) {
+                    return 1;
+                }
+            } catch (\Throwable $e) {
+                $output->writeln('<error>Failure:</error> The API is not compatible');
+                $output->writeln($e->getMessage(), OutputInterface::VERBOSITY_VERBOSE);
 
                 if (!$input->getOption('force')) {
                     return 1;
