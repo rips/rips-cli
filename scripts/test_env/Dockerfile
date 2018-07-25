@@ -5,9 +5,8 @@ ENV DEBIAN_FRONTEND noninteractive
 # Upgrade system.
 RUN \
   apt-get update && \
-  apt-get upgrade -y && \
   apt-get install -y php-cli php-xml php-dom php-sqlite3 php-bcmath php-mbstring php-curl php-memcached php-zip php-pear php-dev \
-                     build-essential git curl wget xz-utils libfontconfig ca-certificates && \
+                     build-essential git curl wget xvfb libxrender1 xz-utils libfontconfig ca-certificates && \
   apt-get clean && apt-get autoremove -y && \
   rm -rf /var/lib/apt/lists/*
 
@@ -17,7 +16,7 @@ COPY configs/20-ast.ini /etc/php/7.2/cli/conf.d/20-ast.ini
 
 # Install NodeJS/NPM.
 RUN \
-  curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
+  curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
   apt-get install -y nodejs
 
 # Install docklint.
