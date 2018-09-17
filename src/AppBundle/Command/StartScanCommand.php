@@ -233,8 +233,11 @@ class StartScanCommand extends ContainerAwareCommand
             $severityDistributions['sum'] = array_reduce(
                 array_keys($severityDistributions),
                 function ($carry, $key) use ($severityDistributions) {
-                    if ($key !== 'New')
-                        return $carry + $severityDistributions[$key];
+                    if ($key === 'New') {
+                        return $carry;
+                    }
+
+                    return $carry + $severityDistributions[$key];
                 },
                 0
             );
