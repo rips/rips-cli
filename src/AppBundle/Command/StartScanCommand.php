@@ -230,7 +230,17 @@ class StartScanCommand extends ContainerAwareCommand
             $output->writeln('<comment>Info:</comment> Scan "' . $scan->getVersion() . '" (' . $scan->getId() . ') finished at ' . $scan->getFinish()->format(DATE_ISO8601), OutputInterface::VERBOSITY_VERBOSE);
 
             $severityDistributions = array_change_key_case($scan->getSeverityDistributions());
-            $severityDistributions['sum'] = array_sum($severityDistributions);
+            $severityDistributions['sum'] = array_reduce(
+                array_keys($severityDistributions),
+                function ($carry, $key) use ($severityDistributions) {
+                    if ($key === 'new') {
+                        return $carry;
+                    }
+
+                    return $carry + $severityDistributions[$key];
+                },
+                0
+            );
 
             $exitCode = 0;
             foreach ($thresholds as $threshold) {
