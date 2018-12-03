@@ -41,12 +41,15 @@ class LoginCommand extends ContainerAwareCommand
         /** @var APIService $api */
         $api = $this->getContainer()->get('rips_connector.api');
 
-        // Windows does not have ca CA bundle, so we have to hard code one.
         $settings = [];
 
-        if (stristr(PHP_OS, 'WIN')) {
+        if (getenv('RIPS_INSECURE_DISABLE_SSL_VERIFICATION')) {
+            $output->writeln('<error>Warning:</error> SSL verification is disabled');
+            $settings['verify'] = false;
+        } else if (stristr(PHP_OS, 'WIN')) {
             /** @var KernelInterface $kernel */
             $kernel = $this->getContainer()->get('kernel');
+            // Windows does not have ca CA bundle, so we have to hard code one.
             $settings['verify'] = realpath($kernel->getRootDir() . '/Resources/cacert.pem');
         }
 
