@@ -47,9 +47,9 @@ parameters:
                 pcidss:
                     methods: ["getPcidss"]
             service:
-                name: "rips_connector.application.scan.issue.types"
+                name: 'RIPS\ConnectorBundle\Services\Application\Scan\Issue\TypeService'
                 list:
-                    method: "getAll"
+                    methods: ["getAll", "getTypes"]
         review_types:
             columns:
                 id:
@@ -62,9 +62,9 @@ parameters:
                     methods: ["getName"]
                     default: true
             service:
-                name: "rips_connector.application.scan.issue.review.types"
+                name: 'RIPS\ConnectorBundle\Services\Application\Scan\Issue\Review\TypeService'
                 list:
-                    method: "getAll"
+                    methods: ["getAll", "getTypes"]
         origin_types:
             columns:
                 id:
@@ -77,9 +77,9 @@ parameters:
                     methods: ["getName"]
                     default: true
             service:
-                name: "rips_connector.application.scan.issue.origin.types"
+                name: 'RIPS\ConnectorBundle\Services\Application\Scan\Issue\Origin\TypeService'
                 list:
-                    method: "getAll"
+                    methods: ["getAll", "getTypes"]
         applications:
             columns:
                 id:
@@ -93,24 +93,17 @@ parameters:
                     default: true
                 created_by_id:
                     methods: ["getCreatedBy", "getId"]
-                created_by_username:
-                    methods: ["getCreatedBy", "getUsername"]
-                    default: true
-                created_by_firstname:
-                    methods: ["getCreatedBy", "getFirstname"]
-                created_by_lastname:
-                    methods: ["getCreatedBy", "getLastname"]
                 charged_quota_id:
                     methods: ["getChargedQuota", "getId"]
-                creation:
-                    methods: ["getCreation"]
+                created_at:
+                    methods: ["getCreatedAt"]
                     default: true
             service:
-                name: "rips_connector.applications"
+                name: 'RIPS\ConnectorBundle\Services\ApplicationService'
                 list:
-                    method: "getAll"
+                    methods: ["getAll", "getApplications"]
                 show:
-                    method: "getById"
+                    methods: ["getById", "getApplication"]
                     arguments:
                         application_id:
                             required: true
@@ -130,11 +123,11 @@ parameters:
                 path:
                     methods: ["getPath"]
                     path: true
-                start:
-                    methods: ["getStart"]
+                started_at:
+                    methods: ["getStartedAt"]
                     default: true
-                finish:
-                    methods: ["getFinish"]
+                finished_at:
+                    methods: ["getFinishedAt"]
                     default: true
                 phase:
                     methods: ["getPhase"]
@@ -148,42 +141,23 @@ parameters:
                     methods: ["getCodeStored"]
                 upload_removed:
                     methods: ["getUploadRemoved"]
-                process_id:
-                    methods: ["getProcess", "getId"]
-                process_start:
-                    methods: ["getProcess", "getStart"]
-                process_finish:
-                    methods: ["getProcess", "getFinish"]
-                process_version:
-                    methods: ["getProcess", "getVersion"]
                 application_id:
                     methods: ["getApplication", "getId"]
                     default: true
                 application_name:
                     methods: ["getApplication", "getName"]
                     default: true
-                application_current_scan:
-                    methods: ["getApplication", "getCurrentScan"]
-                application_creation:
-                    methods: ["getApplication", "getCreation"]
                 created_by_id:
                     methods: ["getCreatedBy", "getId"]
-                created_by_username:
-                    methods: ["getCreatedBy", "getUsername"]
-                    default: true
-                created_by_firstname:
-                    methods: ["getCreatedBy", "getFirstname"]
-                created_by_lastname:
-                    methods: ["getCreatedBy", "getLastname"]
             service:
-                name: "rips_connector.application.scans"
+                name: 'RIPS\ConnectorBundle\Services\Application\ScanService'
                 list:
-                    method: "getAll"
+                    methods: ["getAll", "getScans"]
                     arguments:
                         application_id:
                             required: false
                 show:
-                    method: "getById"
+                    methods: ["getById", "getScan"]
                     arguments:
                         application_id:
                             required: true
@@ -203,111 +177,39 @@ parameters:
                     default: true
                 origin_id:
                     methods: ["getOrigin", "getId"]
-                origin_tag:
-                    methods: ["getOrigin", "getTag"]
-                origin_name:
-                    methods: ["getOrigin", "getName"]
-                    default: true
                 depth:
                     methods: ["getDepth"]
                     default: true
                 type_id:
                     methods: ["getType", "getId"]
-                type_tag:
-                    methods: ["getType", "getTag"]
-                type_description:
-                    methods: ["getType", "getDescription"]
-                type_name:
-                    methods: ["getType", "getName"]
                     default: true
-                type_markup:
-                    methods: ["getType", "getMarkup"]
-                type_severity:
-                    methods: ["getType", "getSeverity"]
-                    default: true
-                type_effort:
-                    methods: ["getType", "getEffort"]
-                type_cwe:
-                    methods: ["getType", "getCwe"]
-                type_owasp:
-                    methods: ["getType", "getOwasp"]
-                type_sans:
-                    methods: ["getType", "getSans"]
-                type_pcidss:
-                    methods: ["getType", "getPcidss"]
                 review_id:
                     methods: ["getLastReview", "getId"]
-                review_submission:
-                    methods: ["getLastReview", "getSubmission"]
-                review_type_id:
-                    methods: ["getLastReview", "getType", "getId"]
-                review_type_tag:
-                    methods: ["getLastReview", "getType", "getTag"]
-                review_type_name:
-                    methods: ["getLastReview", "getType", "getName"]
-                    default: true
                 reviewed:
                     methods: ["getReviewed"]
-                negatively_reviewed:
-                    methods: ["getNegativelyReviewed"]
                 sink_id:
                     methods: ["getSink", "getId"]
-                sink_line:
-                    methods: ["getSink", "getLine"]
+                sink_start_line:
+                    methods: ["getSink", "getStartLine"]
                     default: true
+                sink_end_line:
+                    methods: ["getSink", "getEndLine"]
                 sink_name:
                     methods: ["getSink", "getName"]
                     default: true
                 sink_file_id:
                     methods: ["getSink", "getFile", "getId"]
-                sink_file_loc:
-                    methods: ["getSink", "getFile", "getLoc"]
                 sink_file_path:
                     methods: ["getSink", "getFile", "getPath"]
                     default: true
                     path: true
-                scan_id:
-                    methods: ["getScan", "getId"]
-                scan_version:
-                    methods: ["getScan", "getVersion"]
-                scan_path:
-                    methods: ["getScan", "getPath"]
-                    path: true
-                scan_start:
-                    methods: ["getScan", "getStart"]
-                scan_finish:
-                    methods: ["getScan", "getFinish"]
-                scan_phase:
-                    methods: ["getScan", "getPhase"]
-                scan_percent:
-                    methods: ["getScan", "getPercent"]
-                scan_loc:
-                    methods: ["getScan", "getLoc"]
-                scan_code_stored:
-                    methods: ["getScan", "getCodeStored"]
-                scan_upload_removed:
-                    methods: ["getScan", "getUploadRemoved"]
-                scan_application_id:
-                    methods: ["getScan", "getApplication", "getId"]
-                scan_application_name:
-                    methods: ["getScan", "getApplication", "getName"]
-                scan_application_current_scan:
-                    methods: ["getScan", "getApplication", "getCurrentScan"]
-                scan_application_creation:
-                    methods: ["getScan", "getApplication", "getCreation"]
-                scan_created_by_id:
-                    methods: ["getScan", "getCreatedBy", "getId"]
-                scan_created_by_username:
-                    methods: ["getScan", "getCreatedBy", "getUsername"]
-                scan_created_by_firstname:
-                    methods: ["getScan", "getCreatedBy", "getFirstname"]
-                scan_created_by_lastname:
-                    methods: ["getScan", "getCreatedBy", "getLastname"]
                 source_id:
                     methods: ["getSource", "getId"]
-                source_line:
-                    methods: ["getSource", "getLine"]
+                source_start_line:
+                    methods: ["getSource", "getStartLine"]
                     default: true
+                source_end_line:
+                    methods: ["getSource", "getEndLine"]
                 source_name:
                     methods: ["getSource", "getName"]
                     default: true
@@ -321,9 +223,9 @@ parameters:
                     methods: ["getCve"]
                     default: true
             service:
-                name: "rips_connector.application.scan.issues"
+                name: 'RIPS\ConnectorBundle\Services\Application\Scan\IssueService'
                 list:
-                    method: "getAll"
+                    methods: ["getAll", "getIssues"]
                     arguments:
                         application_id:
                             required: true
@@ -334,8 +236,8 @@ parameters:
                 id:
                     methods: ["getId"]
                     default: true
-                submission:
-                    methods: ["getSubmission"]
+                created_at:
+                    methods: ["getCreatedAt"]
                     default: true
                 name:
                     methods: ["getName"]
@@ -349,22 +251,15 @@ parameters:
                     methods: ["getFile"]
                 created_by_id:
                     methods: ["getCreatedBy", "getId"]
-                created_by_username:
-                    methods: ["getCreatedBy", "getUsername"]
-                    default: true
-                created_by_firstname:
-                    methods: ["getCreatedBy", "getFirstname"]
-                created_by_lastname:
-                    methods: ["getCreatedBy", "getLastname"]
             service:
-                name: "rips_connector.application.uploads"
+                name: 'RIPS\ConnectorBundle\Services\Application\UploadService'
                 list:
-                    method: "getAll"
+                    methods: ["getAll", "getUploads"]
                     arguments:
                         application_id:
                             required: true
                 show:
-                    method: "getById"
+                    methods: ["getById", "getUpload"]
                     arguments:
                         application_id:
                             required: true
@@ -377,7 +272,7 @@ parameters:
                             methods: ["getApplication", "getId"]
                         upload_id:
                             methods: ["getId"]
-        customs:
+        profiles:
             columns:
                 id:
                     methods: ["getId"]
@@ -385,18 +280,21 @@ parameters:
                 name:
                     methods: ["getName"]
                     default: true
-                global:
-                    methods: ["getGlobal"]
+                default:
+                    methods: ["getDefault"]
+                    default: true
+                application_id:
+                    methods: ["getApplication", "getId"]
                     default: true
             service:
-                name: "rips_connector.application.customs"
+                name: 'RIPS\ConnectorBundle\Services\Application\ProfileService'
                 list:
-                    method: "getAll"
+                    methods: ["getAll", "getProfiles"]
                     arguments:
                         application_id:
                             required: false
                 show:
-                    method: "getById"
+                    methods: ["getById", "getProfile"]
                     arguments:
                         application_id:
                             required: true
@@ -442,16 +340,13 @@ parameters:
                     methods: ["getValidUntil"]
                     default: true
             service:
-                name: "rips_connector.quotas"
+                name: 'RIPS\ConnectorBundle\Services\QuotaService'
                 list:
-                    method: "getAll"
+                    methods: ["getAll", "getQuotas"]
         users:
             columns:
                 id:
                     methods: ["getId"]
-                    default: true
-                username:
-                    methods: ["getUsername"]
                     default: true
                 email:
                     methods: ["getEmail"]
@@ -472,14 +367,12 @@ parameters:
                     default: true
                 whitelisted_ips:
                     methods: ["getWhitelistedIps"]
-                callbacks:
-                    methods: ["getCallbacks"]
             service:
-                name: "rips_connector.users"
+                name: 'RIPS\ConnectorBundle\Services\UserService'
                 list:
-                    method: "getAll"
+                    methods: ["getAll", "getUsers"]
                 show:
-                    method: "getById"
+                    methods: ["getById", "getUser"]
                     arguments:
                         user_id:
                             required: true
@@ -497,11 +390,11 @@ parameters:
                     methods: ["getName"]
                     default: true
             service:
-                name: "rips_connector.teams"
+                name: 'RIPS\ConnectorBundle\Services\TeamService'
                 list:
-                    method: "getAll"
+                    methods: ["getAll", "getTeams"]
                 show:
-                    method: "getById"
+                    methods: ["getById", "getTeam"]
                     arguments:
                         team_id:
                             required: true
@@ -520,13 +413,9 @@ parameters:
                     default: true
                 created_by_id:
                     methods: ["getCreatedBy", "getId"]
-                created_by_username:
-                    methods: ["getCreatedBy", "getUsername"]
+                created_by_email:
+                    methods: ["getCreatedBy", "getEmail"]
                     default: true
-                created_by_firstname:
-                    methods: ["getCreatedBy", "getFirstname"]
-                created_by_lastname:
-                    methods: ["getCreatedBy", "getLastname"]
                 application_id:
                     methods: ["getApplication", "getId"]
                     default: true
@@ -537,11 +426,11 @@ parameters:
                     methods: ["getCreatedAt"]
                     default: true
             service:
-                name: "rips_connector.activities"
+                name: 'RIPS\ConnectorBundle\Services\ActivityService'
                 list:
-                    method: "getAll"
+                    methods: ["getAll", "getActivities"]
                 show:
-                    method: "getById"
+                    methods: ["getById", "getActivity"]
                     arguments:
                         activity_id:
                             required: true
@@ -557,11 +446,11 @@ parameters:
                     methods: ["getCreatedAt"]
                     default: true
             service:
-                name: "rips_connector.settings"
+                name: 'RIPS\ConnectorBundle\Services\SettingService'
                 list:
-                    method: "getAll"
+                    methods: ["getAll", "getSettings"]
                 show:
-                    method: "getByKey"
+                    methods: ["getByKey", "getSetting"]
                     arguments:
                         setting_key:
                             required: true

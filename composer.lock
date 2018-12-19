@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "8e08967ef573ba9660bfd721e98d6f47",
+    "content-hash": "072d8e3b50a849236554dc3a7881688c",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -1191,7 +1191,7 @@
             "source": {
                 "type": "git",
                 "url": "https://source.internal.ripstech.com/scm/rac/php-connector.git",
-                "reference": "35755d842cc692dabb5a445eb7031001df4df2db"
+                "reference": "a52eee10dee92dc2aba06d6e5d8eeac366e8d9b3"
             },
             "require": {
                 "ext-json": "*",
@@ -1220,7 +1220,7 @@
                 "BSD-3-Clause"
             ],
             "description": "RIPS API connector package",
-            "time": "2018-12-11T11:08:40+00:00"
+            "time": "2018-12-19T14:14:58+00:00"
         },
         {
             "name": "rips/connector-bundle",
@@ -1228,7 +1228,7 @@
             "source": {
                 "type": "git",
                 "url": "https://source.internal.ripstech.com/scm/rac/php-connector-bundle.git",
-                "reference": "2c219df3d9a16f8123311547678b4a7914768593"
+                "reference": "331939031b60be733396d96afe545f9d6699b26d"
             },
             "require": {
                 "ext-json": "*",
@@ -1244,7 +1244,7 @@
                 "BSD-3-Clause"
             ],
             "description": "RIPS API Connector bundle for Symfony",
-            "time": "2018-12-19T08:41:20+00:00"
+            "time": "2018-12-19T15:50:14+00:00"
         },
         {
             "name": "sensio/distribution-bundle",
@@ -3456,7 +3456,8 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.5.9"
+        "php": ">=5.5.9",
+        "ext-json": "*"
     },
     "platform-dev": [],
     "platform-overrides": {

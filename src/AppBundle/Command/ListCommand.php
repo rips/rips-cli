@@ -16,6 +16,8 @@ use AppBundle\Service\TableColumnService;
 
 class ListCommand extends ContainerAwareCommand
 {
+    const TABLES_PARAMETER = 'tables';
+
     public function configure()
     {
         $this
@@ -28,33 +30,38 @@ class ListCommand extends ContainerAwareCommand
         ;
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @throws \Exception
+     */
+    public function interact(InputInterface $input, OutputInterface $output)
     {
         $loginCommand = $this->getApplication()->find('rips:login');
         if ($loginCommand->run(new ArrayInput(['--config' => true]), $output)) {
-            return 1;
+            return;
         }
 
         $helper = $this->getHelper('question');
-        $allTables = $this->getContainer()->getParameter('tables');
-        $availableTables = [];
 
-        foreach ($allTables as $tableName => $tableDetails) {
-            if (isset($tableDetails['service']['list'])) {
-                $availableTables[] = $tableName;
-            }
+        if (!$input->getOption('table')) {
+            $tableQuestion = new ChoiceQuestion('Please select a table', $this->getAvailableTables());
+            $input->setOption('table', $helper->ask($input, $output, $tableQuestion));
         }
+    }
 
-        // Get the target table from an option or as a fallback from stdin.
-        if (!$table = $input->getOption('table')) {
-            $tableQuestion = new ChoiceQuestion('Please select a table', $availableTables);
-            $table = $helper->ask($input, $output, $tableQuestion);
-        }
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     * @throws \Exception
+     */
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
+        $helper = $this->getHelper('question');
 
-        if (!in_array($table, $availableTables)) {
-            $output->writeln('<error>Failure:</error> Table "' . $table . '" not found');
-            return 1;
-        }
+        /** @var string $table */
+        $table = (string)$input->getOption('table');
 
         // Read out the columns of the table from the config.
         /** @var TableColumnService $tableColumnService */
@@ -116,15 +123,16 @@ class ListCommand extends ContainerAwareCommand
         $filteredArguments[] = $queryParams;
 
         $service = $this->getContainer()->get($serviceDetails['name']);
-        $elements = call_user_func_array([$service, $serviceDetails['list']['method']], $filteredArguments);
+        $response = call_user_func_array([$service, $serviceDetails['list']['methods'][0]], $filteredArguments);
+        $elements = call_user_func([$response, $serviceDetails['list']['methods'][1]]);
 
         /** @var PrettyOutputService $prettyOutputService */
         $prettyOutputService = $this->getContainer()->get(PrettyOutputService::class);
         $maxChars = $input->getOption('max-chars');
 
         // Build the output table row by row.
-        $table = new Table($output);
-        $table->setHeaders($availableColumns);
+        $outputTable = new Table($output);
+        $outputTable->setHeaders($availableColumns);
 
         foreach ($elements as $element) {
             $row = [];
@@ -149,10 +157,34 @@ class ListCommand extends ContainerAwareCommand
             }
 
             ksort($row);
-            $table->addRows([$row]);
+            $outputTable->addRows([$row]);
         }
-        $table->render();
+        $outputTable->render();
 
         return 0;
+    }
+
+    /**
+     * @return array
+     */
+    private function getTables()
+    {
+        return $this->getContainer()->getParameter(self::TABLES_PARAMETER);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getAvailableTables()
+    {
+        $tables = $this->getTables();
+
+        $availableTables = [];
+        foreach ($tables as $tableName => $tableDetails) {
+            if (isset($tableDetails['service']['list'])) {
+                $availableTables[] = $tableName;
+            }
+        }
+        return $availableTables;
     }
 }
