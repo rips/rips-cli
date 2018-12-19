@@ -138,7 +138,7 @@ class StartScanCommand extends ContainerAwareCommand
         }
 
         if ($input->getOption('source')) {
-            $scanInput->setSource($input->getOption('source'));
+            $scanInput->setSource((string)$input->getOption('source'));
         }
 
         $path = (string)$input->getOption('path');
