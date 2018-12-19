@@ -92,7 +92,7 @@ class ExportScanCommand extends ContainerAwareCommand
 
         /** @var RequestService $requestService */
         $requestService = $this->getContainer()->get(RequestService::class);
-        $queryParams = $requestService->transformParametersForQuery($input->getOption('parameter'));
+        $queryParams = $requestService->transformParametersForQuery((array)$input->getOption('parameter'));
 
         $output->writeln('<comment>Info:</comment> Scan is being exported to "' . $file . '"', OutputInterface::VERBOSITY_VERBOSE);
 

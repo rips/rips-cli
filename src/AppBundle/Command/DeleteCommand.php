@@ -123,7 +123,7 @@ class DeleteCommand extends ContainerAwareCommand
 
         /** @var RequestService $requestService */
         $requestService = $this->getContainer()->get(RequestService::class);
-        $queryParams = $requestService->transformParametersForQuery($input->getOption('parameter'));
+        $queryParams = $requestService->transformParametersForQuery((array)$input->getOption('parameter'));
         $readArguments[] = $queryParams;
 
         $service = $this->getContainer()->get($serviceDetails['name']);

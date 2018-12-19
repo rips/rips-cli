@@ -106,7 +106,7 @@ class ListCommand extends ContainerAwareCommand
 
         /** @var RequestService $requestService */
         $requestService = $this->getContainer()->get(RequestService::class);
-        $queryParams = $requestService->transformParametersForQuery($input->getOption('parameter'));
+        $queryParams = $requestService->transformParametersForQuery((array)$input->getOption('parameter'));
         $filteredArguments[] = $queryParams;
 
         $service = $this->getContainer()->get($serviceDetails['name']);

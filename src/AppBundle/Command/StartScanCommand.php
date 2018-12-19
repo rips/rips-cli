@@ -213,7 +213,7 @@ class StartScanCommand extends ContainerAwareCommand
         $output->writeln('<info>Success:</info> Scan "' . $scan->getVersion() . '" (' . $scan->getId() . ') was successfully started at ' . $scan->getStartedAt()->format(DATE_ISO8601));
 
         // Wait for scan to finish if user wants an exit code based on the results.
-        $thresholds = $input->getOption('threshold');
+        $thresholds = (array)$input->getOption('threshold');
         if ($thresholds) {
             $output->writeln('<comment>Info:</comment> Waiting for scan "' . $scan->getVersion() . '" (' . $scan->getId() . ') to finish', OutputInterface::VERBOSITY_VERBOSE);
             $scan = $scanService->blockUntilDone($applicationId, $scan->getId(), 0, 5, [
