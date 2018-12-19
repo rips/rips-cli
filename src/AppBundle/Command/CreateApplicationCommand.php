@@ -58,7 +58,7 @@ class CreateApplicationCommand extends ContainerAwareCommand
             $applicationInput->setChargedQuota($quota);
         }
 
-        $output->writeln('<comment>Info:</comment> Trying to create application "' . $name . '"',OutputInterface::VERBOSITY_VERBOSE);
+        $output->writeln('<comment>Info:</comment> Trying to create application "' . $name . '"', OutputInterface::VERBOSITY_VERBOSE);
 
         /** @var ApplicationService $applicationService */
         $applicationService = $this->getContainer()->get(ApplicationService::class);
