@@ -17,6 +17,8 @@ use AppBundle\Service\TableColumnService;
 
 class DeleteCommand extends ContainerAwareCommand
 {
+    const TABLES_PARAMETER = 'tables';
+
     public function configure()
     {
         $this
@@ -31,33 +33,38 @@ class DeleteCommand extends ContainerAwareCommand
         ;
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @throws \Exception
+     */
+    public function interact(InputInterface $input, OutputInterface $output)
     {
         $loginCommand = $this->getApplication()->find('rips:login');
         if ($loginCommand->run(new ArrayInput(['--config' => true]), $output)) {
-            return 1;
+            return;
         }
 
         $helper = $this->getHelper('question');
-        $allTables = $this->getContainer()->getParameter('tables');
-        $availableTables = [];
 
-        foreach ($allTables as $tableName => $tableDetails) {
-            if (isset($tableDetails['service']['delete'])) {
-                $availableTables[] = $tableName;
-            }
+        if (!$input->getOption('table')) {
+            $tableQuestion = new ChoiceQuestion('Please select a table', $this->getAvailableTables());
+            $input->setOption('table', $helper->ask($input, $output, $tableQuestion));
         }
+    }
 
-        // Get the target table from an option or as a fallback from stdin.
-        if (!$table = $input->getOption('table')) {
-            $tableQuestion = new ChoiceQuestion('Please select a table', $availableTables);
-            $table = $helper->ask($input, $output, $tableQuestion);
-        }
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     * @throws \Exception
+     */
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
+        $helper = $this->getHelper('question');
 
-        if (!in_array($table, $availableTables)) {
-            $output->writeln('<error>Failure:</error> Table "' . $table . '" not found');
-            return 1;
-        }
+        /** @var string $table */
+        $table = (string)$input->getOption('table');
 
         /** @var TableColumnService $tableColumnService */
         $tableColumnService = $this->getContainer()->get(TableColumnService::class);
@@ -133,9 +140,11 @@ class DeleteCommand extends ContainerAwareCommand
 
         $service = $this->getContainer()->get($serviceDetails['name']);
         if ($input->getOption('list')) {
-            $elements = call_user_func_array([$service, $serviceDetails['list']['method']], $readArguments);
+            $response = call_user_func_array([$service, $serviceDetails['list']['methods'][0]], $readArguments);
+            $elements = call_user_func([$response, $serviceDetails['list']['methods'][1]]);
         } else {
-            $elements = [call_user_func_array([$service, $serviceDetails['show']['method']], $readArguments)];
+            $response = call_user_func_array([$service, $serviceDetails['show']['methods'][0]], $readArguments);
+            $elements = [call_user_func([$response, $serviceDetails['show']['methods'][1]])];
         }
 
         if ($input->getOption('force')) {
@@ -146,8 +155,8 @@ class DeleteCommand extends ContainerAwareCommand
             $maxChars = $input->getOption('max-chars');
 
             // Build the output table row by row.
-            $table = new Table($output);
-            $table->setHeaders($availableColumns);
+            $outputTable = new Table($output);
+            $outputTable->setHeaders($availableColumns);
 
             foreach ($elements as $element) {
                 $row = [];
@@ -172,9 +181,9 @@ class DeleteCommand extends ContainerAwareCommand
                 }
 
                 ksort($row);
-                $table->addRows([$row]);
+                $outputTable->addRows([$row]);
             }
-            $table->render();
+            $outputTable->render();
 
             $output->writeln("\n" . '<error>ALL DELETED ELEMENTS AND SUB ELEMENTS WILL BE IRREVOCABLY LOST!</error>');
             $deleteQuestion = new ConfirmationQuestion('Do you really want to delete the listed elements? (y/n) ', false);
@@ -217,5 +226,29 @@ class DeleteCommand extends ContainerAwareCommand
         }
 
         return 0;
+    }
+
+    /**
+     * @return array
+     */
+    private function getTables()
+    {
+        return $this->getContainer()->getParameter(self::TABLES_PARAMETER);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getAvailableTables()
+    {
+        $tables = $this->getTables();
+
+        $availableTables = [];
+        foreach ($tables as $tableName => $tableDetails) {
+            if (isset($tableDetails['service']['delete'])) {
+                $availableTables[] = $tableName;
+            }
+        }
+        return $availableTables;
     }
 }

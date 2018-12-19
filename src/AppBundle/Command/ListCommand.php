@@ -63,7 +63,6 @@ class ListCommand extends ContainerAwareCommand
         /** @var string $table */
         $table = (string)$input->getOption('table');
 
-        // Read out the columns of the table from the config.
         /** @var TableColumnService $tableColumnService */
         $tableColumnService = $this->getContainer()->get(TableColumnService::class);
 
