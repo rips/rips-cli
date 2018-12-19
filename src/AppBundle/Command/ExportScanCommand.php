@@ -71,20 +71,12 @@ class ExportScanCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var string $type */
         $type = (string)$input->getOption('type');
-
-        /** @var array $typeData */
         $typeData = $this->getType($type);
-
-        /** @var int $applicationId */
         $applicationId = (int)$input->getOption('application');
-
-        /** @var int $scanId */
         $scanId = (int)$input->getOption('scan');
-
-        /** @var string $file */
         $file = (string)$input->getOption('file');
+
         if (!$file) {
             // Create file name in case --no-interaction is used.
             $file = $applicationId . '_' . $scanId . '.' . $typeData['extension'];

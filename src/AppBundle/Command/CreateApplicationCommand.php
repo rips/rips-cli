@@ -47,11 +47,9 @@ class CreateApplicationCommand extends ContainerAwareCommand
 
         $applicationInput = new ApplicationBuilder();
 
-        /** @var string $name */
         $name = (string)$input->getOption('name');
         $applicationInput->setName($name);
 
-        /** @var int $quota */
         $quota = (int)$input->getOption('quota');
         if ($quota) {
             $output->writeln('<comment>Info:</comment> Using quota "' . $quota . '" to create application', OutputInterface::VERBOSITY_VERBOSE);

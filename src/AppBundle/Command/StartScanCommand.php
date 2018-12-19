@@ -106,12 +106,11 @@ class StartScanCommand extends ContainerAwareCommand
 
         $scanInput = new ScanBuilder();
 
-        /** @var string $version */
-        $version = (string)$input->getOption('name');
-        if (!$version) {
-            $version = date(DATE_ISO8601);
+        if ($input->getOption('name')) {
+            $scanInput->setVersion((string)$input->getOption('name'));
+        } else {
+            $scanInput->setVersion(date(DATE_ISO8601));
         }
-        $scanInput->setVersion($version);
 
         if ($input->getOption('remove-upload')) {
             $scanInput->setUploadRemoved(true);
@@ -137,14 +136,10 @@ class StartScanCommand extends ContainerAwareCommand
             $scanInput->setIssueTypes((array)$input->getOption('issue-type'));
         }
 
-        /** @var string $path */
         $path = (string)$input->getOption('path');
-
-        /** @var int $applicationId */
         $applicationId = (int)$input->getOption('application');
-
-        /** @var int $uploadId */
         $uploadId = (int)$input->getOption('upload');
+
         if ($uploadId) {
             $output->writeln('<comment>Info:</comment> Using existing upload "' . $uploadId . '"', OutputInterface::VERBOSITY_VERBOSE);
             $scanInput->setUpload($uploadId);
@@ -208,7 +203,7 @@ class StartScanCommand extends ContainerAwareCommand
         /** @var ScanService $scanService */
         $scanService = $this->getContainer()->get(ScanService::class);
 
-        $output->writeln('<comment>Info:</comment> Trying to start scan "' . $version . '"', OutputInterface::VERBOSITY_VERBOSE);
+        $output->writeln('<comment>Info:</comment> Trying to start scan', OutputInterface::VERBOSITY_VERBOSE);
         $scan = $scanService->create($applicationId, $arrayInput)->getScan();
         $output->writeln('<info>Success:</info> Scan "' . $scan->getVersion() . '" (' . $scan->getId() . ') was successfully started at ' . $scan->getStartedAt()->format(DATE_ISO8601));
 

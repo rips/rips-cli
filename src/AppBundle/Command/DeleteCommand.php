@@ -64,12 +64,10 @@ class DeleteCommand extends ContainerAwareCommand
     {
         $helper = $this->getHelper('question');
 
-        /** @var string $table */
-        $table = (string)$input->getOption('table');
-
         /** @var TableColumnService $tableColumnService */
         $tableColumnService = $this->getContainer()->get(TableColumnService::class);
 
+        $table = (string)$input->getOption('table');
         $availableColumns = $tableColumnService->getColumns($table);
         $columnDetails = $tableColumnService->getColumnDetails($table);
         $serviceDetails = $tableColumnService->getServiceDetails($table);
@@ -140,7 +138,6 @@ class DeleteCommand extends ContainerAwareCommand
         } else {
             /** @var PrettyOutputService $prettyOutputService */
             $prettyOutputService = $this->getContainer()->get(PrettyOutputService::class);
-            /** @var int $maxChars */
             $maxChars = (int)$input->getOption('max-chars');
 
             // Build the output table row by row.
