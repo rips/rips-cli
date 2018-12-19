@@ -20,16 +20,16 @@ class CredentialService
     }
 
     /**
-     * @param string $username
+     * @param string $email
      * @param string $password
      * @param string $apiUri
      */
-    public function storeCredentials($username, $password, $apiUri)
+    public function storeCredentials($email, $password, $apiUri)
     {
         $config = $this->configService->loadConfig();
         $config[self::CONFIG_KEY] = [
             'base_uri' => $apiUri,
-            'username' => $username,
+            'email'    => $email,
             'password' => $password
         ];
         $this->configService->saveConfig($config);

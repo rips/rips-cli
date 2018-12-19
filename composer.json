@@ -21,11 +21,13 @@
     },
     "require": {
         "php": ">=5.5.9",
+        "ext-json": "*",
         "phpmetrics/phpmetrics": "^2.4",
-        "rips/connector-bundle": "^2.15",
+        "rips/connector": "dev-dev",
+        "rips/connector-bundle": "dev-dev",
         "sensio/distribution-bundle": "^5.0.19",
         "sensio/framework-extra-bundle": "^3.0.2",
-        "symfony/symfony": "3.3.*"
+        "symfony/symfony": "3.4.*"
     },
     "require-dev": {
         "phan/phan": "^0.12.2",
@@ -62,5 +64,15 @@
         "symfony-tests-dir": "tests",
         "symfony-assets-install": "relative",
         "branch-alias": null
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "https://source.internal.ripstech.com/scm/rac/php-connector.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "https://source.internal.ripstech.com/scm/rac/php-connector-bundle.git"
+        }
+    ]
 }

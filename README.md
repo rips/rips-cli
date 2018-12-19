@@ -1,7 +1,7 @@
 rips-cli
 ========
 
-A command line interface for RIPS v2.
+A command line interface for RIPS v3.
 
 <a href="https://asciinema.org/a/160101?autoplay=1"><img src="https://asciinema.org/a/160101.png" width="600" /></a>
 
@@ -14,7 +14,7 @@ It is recommended to use the [PHAR build](https://kb.ripstech.com/display/DOC/RI
 
 # Usage
 ## Configuration
-`rips-cli` looks for the configuration file `~/.rips.yml` and uses it if it is available. You can create the file with `rips-cli` itself. For example, by calling `rips-cli rips:login` you store credentials in the configuration to avoid having to enter them on every command. Be aware that the password is stored in clear text.
+`rips-cli` looks for the configuration file `~/.rips3.yml` and uses it if it is available. You can create the file with `rips-cli` itself. For example, by calling `rips-cli rips:login` you store credentials in the configuration to avoid having to enter them on every command. Be aware that the password is stored in clear text.
 
 ## Environment
 You can also use environment variables to set certain properties.
@@ -22,7 +22,7 @@ You can also use environment variables to set certain properties.
 | Name          | Description                    |
 |---------------|--------------------------------|
 | RIPS_BASE_URI | Set API address                |
-| RIPS_USERNAME | Set API username               |
+| RIPS_EMAIL    | Set API e-mail                 |
 | RIPS_PASSWORD | Set API password               |
 | RIPS_CONFIG   | Set path to configuration file |
 

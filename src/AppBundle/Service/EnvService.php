@@ -26,4 +26,21 @@ class EnvService
 
         return $content[$env];
     }
+
+    /**
+     * @param string $env
+     * @param string $file
+     * @return bool
+     * @throws \Exception if env file does not exist
+     */
+    public function hasEnv($env, $file)
+    {
+        if (!file_exists($file)) {
+            throw new \Exception('Env file not found');
+        }
+
+        $content = Yaml::parse(file_get_contents($file));
+
+        return isset($content[$env]);
+    }
 }

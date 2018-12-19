@@ -31,21 +31,24 @@ services:
     AppBundle\Service\PrettyOutputService:
         public: true
 
-    AppBundle\Service\TableColumnService:
-        public: true
-        calls:
-            - [ setConfigService, ["@AppBundle\\Service\\ConfigService"] ]
-            - [ setTables, ["%tables%"] ]
-
-    AppBundle\Service\CredentialService:
-        public: true
-        calls:
-            - [ setConfigService, ["@AppBundle\\Service\\ConfigService"] ]
-
     AppBundle\Service\ConfigService:
         public: true
         calls:
             - [ setFile, ["%config_file%"] ]
 
+    AppBundle\Service\TableColumnService:
+        public: true
+        calls:
+            - [ setConfigService, ['@AppBundle\Service\ConfigService'] ]
+            - [ setTables, ["%tables%"] ]
+
+    AppBundle\Service\CredentialService:
+        public: true
+        calls:
+            - [ setConfigService, ['@AppBundle\Service\ConfigService'] ]
+
     AppBundle\Service\EnvService:
+        public: true
+
+    AppBundle\Service\RequestService:
         public: true

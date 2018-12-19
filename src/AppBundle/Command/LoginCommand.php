@@ -30,7 +30,7 @@ class LoginCommand extends ContainerAwareCommand
     {
         // Env variables have the highest priority and override everything else.
         $apiUri = getenv('RIPS_BASE_URI');
-        $loginUsername = getenv('RIPS_USERNAME');
+        $loginEmail = getenv('RIPS_EMAIL');
         $loginPassword = getenv('RIPS_PASSWORD');
 
         $helper = $this->getHelper('question');
@@ -39,7 +39,7 @@ class LoginCommand extends ContainerAwareCommand
         /** @var CredentialService $credentialService */
         $credentialService = $this->getContainer()->get(CredentialService::class);
         /** @var APIService $api */
-        $api = $this->getContainer()->get('rips_connector.api');
+        $api = $this->getContainer()->get(APIService::class);
 
         $settings = [];
 
@@ -62,15 +62,15 @@ class LoginCommand extends ContainerAwareCommand
 
             $settings['base_uri'] = $credentials['base_uri'];
 
-            if ($loginUsername) {
-                $credentials['username'] = $loginUsername;
+            if ($loginEmail) {
+                $credentials['email'] = $loginEmail;
             }
 
             if ($loginPassword) {
                 $credentials['password'] = $loginPassword;
             }
 
-            $api->initialize($credentials['username'], $credentials['password'], $settings);
+            $api->initialize($credentials['email'], $credentials['password'], $settings);
         } else {
             if (!$apiUri) {
                 $defaultApiUri = $this->getContainer()->getParameter('default_api_url');
@@ -80,9 +80,9 @@ class LoginCommand extends ContainerAwareCommand
 
             $settings['base_uri'] = $apiUri;
 
-            while (!$loginUsername) {
-                $loginUsernameQuestion = new Question('Please enter username: ');
-                $loginUsername = $helper->ask($input, $output, $loginUsernameQuestion);
+            while (!$loginEmail) {
+                $loginEmailQuestion = new Question('Please enter e-mail: ');
+                $loginEmail = $helper->ask($input, $output, $loginEmailQuestion);
             };
 
             while (!$loginPassword) {
@@ -94,7 +94,7 @@ class LoginCommand extends ContainerAwareCommand
 
             try {
                 // Before the credentials are stored the user might want to check them first.
-                $api->initialize($loginUsername, $loginPassword, $settings);
+                $api->initialize($loginEmail, $loginPassword, $settings);
 
                 $output->writeln('<comment>Info:</comment> Requesting status', OutputInterface::VERBOSITY_VERBOSE);
                 $api->getStatus();
@@ -130,7 +130,7 @@ class LoginCommand extends ContainerAwareCommand
                 }
                 if ($storeConfirmation) {
                     $output->writeln('<comment>Info:</comment> Trying to store credentials in ' . $configService->getFile(), OutputInterface::VERBOSITY_VERBOSE);
-                    $credentialService->storeCredentials($loginUsername, $loginPassword, $apiUri);
+                    $credentialService->storeCredentials($loginEmail, $loginPassword, $apiUri);
                     $output->writeln('<info>Success:</info> Credentials have been stored successfully');
                 }
             }
