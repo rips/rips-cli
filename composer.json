@@ -27,7 +27,7 @@
         "rips/connector-bundle": "dev-dev",
         "sensio/distribution-bundle": "^5.0.19",
         "sensio/framework-extra-bundle": "^3.0.2",
-        "symfony/symfony": "3.3.*"
+        "symfony/symfony": "3.4.*"
     },
     "require-dev": {
         "phan/phan": "^0.12.2",
