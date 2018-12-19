@@ -45,6 +45,7 @@ class StartScanCommand extends ContainerAwareCommand
             ->addOption('remove-code', 'R', InputOption::VALUE_NONE, 'Remove source code from RIPS once analysis is finished')
             ->addOption('keep-code', 'r', InputOption::VALUE_NONE, 'Keep source code in RIPS once analysis is finished')
             ->addOption('issue-type', 'I', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Override the issue types')
+            ->addOption('source', 'S', InputOption::VALUE_REQUIRED, 'Modify the source of the scan', 'rips-cli')
         ;
     }
 
@@ -134,6 +135,10 @@ class StartScanCommand extends ContainerAwareCommand
 
         if ($input->getOption('issue-type')) {
             $scanInput->setIssueTypes((array)$input->getOption('issue-type'));
+        }
+
+        if ($input->getOption('source')) {
+            $scanInput->setSource($input->getOption('source'));
         }
 
         $path = (string)$input->getOption('path');
