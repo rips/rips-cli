@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use RIPS\ConnectorBundle\Services\ApplicationService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use RIPS\ConnectorBundle\InputBuilders\ApplicationBuilder;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,44 +23,51 @@ class CreateApplicationCommand extends ContainerAwareCommand
         ;
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function interact(InputInterface $input, OutputInterface $output)
     {
         $loginCommand = $this->getApplication()->find('rips:login');
         if ($loginCommand->run(new ArrayInput(['--config' => true]), $output)) {
-            return 1;
+            return;
         }
 
         $helper = $this->getHelper('question');
 
-        if (!$name = $input->getOption('name')) {
+        if (!$input->getOption('name')) {
             $nameQuestion = new Question('Please enter a name: ');
-            $name = $helper->ask($input, $output, $nameQuestion);
+            $input->setOption('name', $helper->ask($input, $output, $nameQuestion));
         }
+    }
 
-        if (!$name) {
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
+        if (!$input->getOption('name')) {
             $output->writeln('<error>Failure:</error> Name can not be empty');
             return 1;
         }
 
-        $applicationInput = [
-            'name' => $name
-        ];
+        $applicationInput = new ApplicationBuilder();
 
-        if ($quota = $input->getOption('quota')) {
+        /** @var string $name */
+        $name = (string)$input->getOption('name');
+        $applicationInput->setName($name);
+
+        /** @var int $quota */
+        $quota = (int)$input->getOption('quota');
+        if ($quota) {
             $output->writeln('<comment>Info:</comment> Using quota "' . $quota . '" to create application', OutputInterface::VERBOSITY_VERBOSE);
-            $applicationInput['chargedQuota'] = $quota;
+            $applicationInput->setChargedQuota($quota);
         }
 
-        /** @var \RIPS\ConnectorBundle\Services\ApplicationService $applicationService */
-        $applicationService = $this->getContainer()->get('rips_connector.applications');
+        $output->writeln('<comment>Info:</comment> Trying to create application "' . $name . '"',OutputInterface::VERBOSITY_VERBOSE);
 
-        $output->writeln('<comment>Info:</comment> Trying to create application "' . $name . '"', OutputInterface::VERBOSITY_VERBOSE);
-        $application = $applicationService->create(
-            new ApplicationBuilder($applicationInput)
-        );
-        $output->writeln('<info>Success:</info> Application "' . $application->getName() . '" (' . $application->getId() . ') was created at ' . $application->getCreation()->format(DATE_ISO8601));
+        /** @var ApplicationService $applicationService */
+        $applicationService = $this->getContainer()->get(ApplicationService::class);
+        $application = $applicationService->create($applicationInput)->getApplication();
 
-        if ($chargedQuota = $application->getChargedQuota()) {
+        $output->writeln('<info>Success:</info> Application "' . $application->getName() . '" (' . $application->getId() . ') was created at ' . $application->getCreatedAt()->format(DATE_ISO8601));
+
+        $chargedQuota = $application->getChargedQuota();
+        if ($chargedQuota) {
             $output->writeln('<comment>Info:</comment> Quota "' . $chargedQuota->getId() . '" was used to create application "' . $application->getName() . '" (' . $application->getId() . ')', OutputInterface::VERBOSITY_VERBOSE);
         }
 
