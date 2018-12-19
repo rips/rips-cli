@@ -2,6 +2,11 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\RequestService;
+use PHP_CodeSniffer\Filters\Filter;
+use RIPS\ConnectorBundle\InputBuilders\FilterBuilder;
+use RIPS\ConnectorBundle\Services\Application\Scan\Issue\ReviewService;
+use RIPS\ConnectorBundle\Services\Application\Scan\IssueService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,78 +30,85 @@ class ReviewIssuesCommand extends ContainerAwareCommand
         ;
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @throws \Exception
+     */
+    public function interact(InputInterface $input, OutputInterface $output)
     {
         $loginCommand = $this->getApplication()->find('rips:login');
         if ($loginCommand->run(new ArrayInput(['--config' => true]), $output)) {
-            return 1;
+            return;
         }
 
         $helper = $this->getHelper('question');
 
-        if (!$applicationId = $input->getOption('application')) {
+        if (!$input->getOption('application')) {
             $applicationQuestion = new Question('Please enter an application id: ');
-            $applicationId = $helper->ask($input, $output, $applicationQuestion);
+            $input->setOption('application', $helper->ask($input, $output, $applicationQuestion));
         }
 
-        if (!$scanId = $input->getOption('scan')) {
+        if (!$input->getOption('scan')) {
             $scanQuestion = new Question('Please enter a scan id: ');
-            $scanId = $helper->ask($input, $output, $scanQuestion);
+            $input->setOption('scan', $helper->ask($input, $output, $scanQuestion));
         }
 
-        if (!$typeId = $input->getOption('type')) {
+        if (!$input->getOption('type')) {
             $typeQuestion = new Question('Please enter a review type id: ');
-            $typeId = $helper->ask($input, $output, $typeQuestion);
+            $input->setOption('type', $helper->ask($input, $output, $typeQuestion));
         }
+    }
 
-        // Add (optional) query parameters.
-        $queryParams = [];
-        foreach ($input->getOption('parameter') as $parameter) {
-            $parameterSplit = explode('=', $parameter, 2);
+    public function execute(InputInterface $input, OutputInterface $output)
+    {
+        /** @var int $applicationId */
+        $applicationId = (int)$input->getOption('application');
 
-            if (isset($queryParams[$parameterSplit[0]])) {
-                $output->writeln('<error>Failure:</error> Query parameter collision of "' . $parameterSplit[0] . '"');
-                return 1;
-            }
+        /** @var int $scanId */
+        $scanId = (int)$input->getOption('scan');
 
-            if (count($parameterSplit) === 1) {
-                $queryParams[$parameterSplit[0]] = 1;
-            } else {
-                $queryParams[$parameterSplit[0]] = $parameterSplit[1];
-            }
-        }
+        /** @var int $typeId */
+        $typeId = (int)$input->getOption('type');
 
-        /** @var \RIPS\ConnectorBundle\Services\Application\Scan\IssueService $issueService */
-        $issueService = $this->getContainer()->get('rips_connector.application.scan.issues');
+        /** @var RequestService $requestService */
+        $requestService = $this->getContainer()->get(RequestService::class);
+        $queryParams = $requestService->transformParametersForQuery($input->getOption('parameter'));
+
+        /** @var IssueService $issueService */
+        $issueService = $this->getContainer()->get(IssueService::class);
 
         // There is no point in getting issues that have this review already. But when the last review is null and we
         // use it in a filter, no issues are returned. So we have to split this into two requests.
+        $filterBuilder = new FilterBuilder();
+
         $queryParams1 = $queryParams;
-        $queryParams1['notNull[lastReviewType]'] = 1;
-        $queryParams1['notEqual[lastReviewType]'] = $typeId;
-        $issues = $issueService->getAll($applicationId, $scanId, $queryParams1);
+        $queryParams1['filter'] = $filterBuilder->getFilterString($filterBuilder->and(
+            $filterBuilder->notNull('lastReviewType'),
+            $filterBuilder->notEqual('lastReviewType', $typeId)
+        ));
+        $issues = $issueService->getAll($applicationId, $scanId, $queryParams1)->getIssues();
 
         // Review type 1 is "no review", so there is no point in getting issues without review.
         if (intval($typeId) !== 1) {
             $queryParams2 = $queryParams;
-            $queryParams2['null[lastReviewType]'] = 1;
-            $issues = array_merge($issues, $issueService->getAll($applicationId, $scanId, $queryParams2));
+            $queryParams2['filter'] = $filterBuilder->getFilterString($filterBuilder->null('lastReviewType'));
+            $issues = array_merge($issues, $issueService->getAll($applicationId, $scanId, $queryParams2)->getIssues());
         }
 
-        /** @var \RIPS\ConnectorBundle\Services\Application\Scan\Issue\ReviewService $reviewService */
-        $reviewService = $this->getContainer()->get('rips_connector.application.scan.issue.reviews');
+        /** @var ReviewService $reviewService */
+        $reviewService = $this->getContainer()->get(ReviewService::class);
 
         /** @var \RIPS\ConnectorBundle\Entities\Application\Scan\IssueEntity $issue */
         foreach ($issues as $issue) {
-            $reviewInput = new ReviewBuilder([
-                'type' => $typeId
-            ]);
-            $review = $reviewService->create($applicationId, $scanId, $issue->getId(), $reviewInput);
+            $reviewInput = new ReviewBuilder();
+            $reviewInput->setType($typeId);
+            $review = $reviewService->create($applicationId, $scanId, $issue->getId(), $reviewInput)->getReview();
             $output->writeln('<info>Success:</info> Review ' . $review->getId() . ' was successfully created');
 
             // The API contains a flood protection. We throttle the requests a bit to avoid triggering it.
-            if ($sleep = $input->getOption('sleep')) {
-                sleep($sleep);
+            if ($input->getOption('sleep')) {
+                sleep($input->getOption('sleep'));
             }
         }
 
