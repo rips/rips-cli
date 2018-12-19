@@ -38,7 +38,7 @@ class ExportScanCommand extends ContainerAwareCommand
     {
         $loginCommand = $this->getApplication()->find('rips:login');
         if ($loginCommand->run(new ArrayInput(['--config' => true]), $output)) {
-            return;
+            exit(1);
         }
 
         $helper = $this->getHelper('question');

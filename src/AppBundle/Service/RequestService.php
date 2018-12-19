@@ -5,7 +5,7 @@ namespace AppBundle\Service;
 class RequestService
 {
     /**
-     * @param $parameters
+     * @param string[] $parameters
      * @return array
      */
     public function transformParametersForQuery($parameters)

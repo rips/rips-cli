@@ -57,7 +57,7 @@ class StartScanCommand extends ContainerAwareCommand
     {
         $loginCommand = $this->getApplication()->find('rips:login');
         if ($loginCommand->run(new ArrayInput(['--config' => true]), $output)) {
-            return;
+            exit(1);
         }
 
         $helper = $this->getHelper('question');
@@ -126,15 +126,15 @@ class StartScanCommand extends ContainerAwareCommand
         }
 
         if ($input->getOption('profile')) {
-            $scanInput->setProfile($input->getOption('profile'));
+            $scanInput->setProfile((int)$input->getOption('profile'));
         }
 
         if ($input->getOption('parent')) {
-            $scanInput->setParent($input->getOption('parent'));
+            $scanInput->setParent((int)$input->getOption('parent'));
         }
 
         if ($input->getOption('issue-type')) {
-            $scanInput->setIssueTypes($input->getOption('issue-type'));
+            $scanInput->setIssueTypes((array)$input->getOption('issue-type'));
         }
 
         /** @var string $path */
@@ -159,15 +159,22 @@ class StartScanCommand extends ContainerAwareCommand
                 return 1;
             }
 
-            $upload = $this->uploadPath($applicationId, $realPath, $input->getOption('exclude-path'));
+            $upload = $this->uploadPath($applicationId, $realPath, (array)$input->getOption('exclude-path'));
+            if (!$upload) {
+                $output->writeln('<error>Error:</error> Could not upload archive');
+                return 1;
+            }
+
             $output->writeln('<info>Success:</info> Archive "' . $upload->getName() . '" (' . $upload->getId() . ') was successfully uploaded');
             $scanInput->setUpload($upload->getId());
         }
 
         $arrayInput = ['scan' => $scanInput];
 
-        if ($input->getOption('env-file')) {
-            $output->writeln('<comment>Info:</comment> Using env from ' . $input->getOption('env-file'), OutputInterface::VERBOSITY_VERBOSE);
+        /** @var string $envFile */
+        $envFile = (string)$input->getOption('env-file');
+        if ($envFile) {
+            $output->writeln('<comment>Info:</comment> Using env from ' . $envFile, OutputInterface::VERBOSITY_VERBOSE);
             try {
                 /** @var EnvService $envService */
                 $envService = $this->getContainer()->get(EnvService::class);
@@ -178,11 +185,11 @@ class StartScanCommand extends ContainerAwareCommand
                 ];
 
                 foreach ($languageEnvs as $languageEnvKey => $languageEnvClass) {
-                    if (!$envService->hasEnv($languageEnvKey, $input->getOption('env-file'))) {
+                    if (!$envService->hasEnv($languageEnvKey, $envFile)) {
                         continue;
                     }
                     $arrayInput[$languageEnvKey] = new $languageEnvClass(
-                        $envService->loadEnvFromFile($languageEnvKey, $input->getOption('env-file'))
+                        $envService->loadEnvFromFile($languageEnvKey, $envFile)
                     );
                 }
             } catch (\Exception $e) {
@@ -191,9 +198,11 @@ class StartScanCommand extends ContainerAwareCommand
             }
         }
 
-        if ($input->getOption('tag')) {
-            $output->writeln('<comment>Info:</comment> Using tags ' . implode(', ', $input->getOption('tag')), OutputInterface::VERBOSITY_VERBOSE);
-            $arrayInput['tags'] = new TagBuilder($input->getOption('tag'));
+        /** @var array $tags */
+        $tags = (array)$input->getOption('tag');
+        if ($tags) {
+            $output->writeln('<comment>Info:</comment> Using tags ' . implode(', ', $tags), OutputInterface::VERBOSITY_VERBOSE);
+            $arrayInput['tags'] = new TagBuilder($tags);
         }
 
         /** @var ScanService $scanService */

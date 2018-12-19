@@ -3,6 +3,7 @@
 namespace AppBundle\Command;
 
 use AppBundle\Service\PrettyOutputService;
+use AppBundle\Service\RequestService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -39,7 +40,7 @@ class ListCommand extends ContainerAwareCommand
     {
         $loginCommand = $this->getApplication()->find('rips:login');
         if ($loginCommand->run(new ArrayInput(['--config' => true]), $output)) {
-            return;
+            exit(1);
         }
 
         $helper = $this->getHelper('question');
@@ -103,22 +104,9 @@ class ListCommand extends ContainerAwareCommand
             }
         }
 
-        // Add (optional) query parameters.
-        $queryParams = [];
-        foreach ($input->getOption('parameter') as $parameter) {
-            $parameterSplit = explode('=', $parameter, 2);
-
-            if (isset($queryParams[$parameterSplit[0]])) {
-                $output->writeln('<error>Failure:</error> Query parameter collision of "' . $parameterSplit[0] . '"');
-                return 1;
-            }
-
-            if (count($parameterSplit) === 1) {
-                $queryParams[$parameterSplit[0]] = 1;
-            } else {
-                $queryParams[$parameterSplit[0]] = $parameterSplit[1];
-            }
-        }
+        /** @var RequestService $requestService */
+        $requestService = $this->getContainer()->get(RequestService::class);
+        $queryParams = $requestService->transformParametersForQuery($input->getOption('parameter'));
         $filteredArguments[] = $queryParams;
 
         $service = $this->getContainer()->get($serviceDetails['name']);
@@ -127,7 +115,8 @@ class ListCommand extends ContainerAwareCommand
 
         /** @var PrettyOutputService $prettyOutputService */
         $prettyOutputService = $this->getContainer()->get(PrettyOutputService::class);
-        $maxChars = $input->getOption('max-chars');
+        /** @var int $maxChars */
+        $maxChars = (int)$input->getOption('max-chars');
 
         // Build the output table row by row.
         $outputTable = new Table($output);
