@@ -21,6 +21,7 @@
     },
     "require": {
         "php": ">=5.5.9",
+        "ext-json": "*",
         "phpmetrics/phpmetrics": "^2.4",
         "rips/connector": "dev-dev",
         "rips/connector-bundle": "dev-dev",
