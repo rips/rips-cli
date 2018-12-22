@@ -142,7 +142,7 @@ class ListCommand extends ContainerAwareCommand
             }
 
             ksort($row);
-            $outputTable->addRows([$row]);
+            $outputTable->addRow($row);
         }
         $outputTable->render();
 

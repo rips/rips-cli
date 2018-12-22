@@ -69,7 +69,7 @@ class ListSetupCommand extends ContainerAwareCommand
         $columnTable = new Table($output);
         $columnTable->setHeaders(['possible columns']);
         foreach (array_keys($columnDetails) as $column) {
-            $columnTable->addRows([[$column]]);
+            $columnTable->addRow([$column]);
         }
         $columnTable->render();
 
