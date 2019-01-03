@@ -40,8 +40,14 @@ parameters:
                     default: true
                 cwe:
                     methods: ["getCwe"]
-                owasp:
-                    methods: ["getOwasp"]
+                owasp2010:
+                    methods: ["getOwasp2010"]
+                owasp2013:
+                    methods: ["getOwasp2013"]
+                owasp2017:
+                    methods: ["getOwasp2017"]
+                asvs301:
+                    methods: ["getAsvs301"]
                 sans:
                     methods: ["getSans"]
                 pcidss:
