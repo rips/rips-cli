@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "56d3d9f98f61daf9133a9dbc61f586f7",
+    "content-hash": "252752d1ff1bf5029e703af4300025b0",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -1187,11 +1187,17 @@
         },
         {
             "name": "rips/connector",
-            "version": "dev-dev",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
-                "url": "https://source.internal.ripstech.com/scm/rac/php-connector.git",
-                "reference": "a93c96afa441754aa45454259cba1dce914c0567"
+                "url": "https://github.com/rips/php-connector.git",
+                "reference": "4131ffc938f6f8303bf53f8f647def1bdf0ebdf6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rips/php-connector/zipball/4131ffc938f6f8303bf53f8f647def1bdf0ebdf6",
+                "reference": "4131ffc938f6f8303bf53f8f647def1bdf0ebdf6",
+                "shasum": ""
             },
             "require": {
                 "ext-json": "*",
@@ -1208,31 +1214,30 @@
                     "RIPS\\Connector\\": "src"
                 }
             },
-            "autoload-dev": {
-                "classmap": [
-                    "test/TestCase.php"
-                ],
-                "psr-4": {
-                    "RIPS\\Test\\": "test"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
             "description": "RIPS API connector package",
-            "time": "2018-12-19T18:33:22+00:00"
+            "time": "2019-01-04T08:17:57+00:00"
         },
         {
             "name": "rips/connector-bundle",
-            "version": "dev-dev",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
-                "url": "https://source.internal.ripstech.com/scm/rac/php-connector-bundle.git",
-                "reference": "ff39a824e27d6204438f61823436268676fa269e"
+                "url": "https://github.com/rips/php-connector-bundle.git",
+                "reference": "9201bf0355552a4b8c58290d369d60959a0e67f1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rips/php-connector-bundle/zipball/9201bf0355552a4b8c58290d369d60959a0e67f1",
+                "reference": "9201bf0355552a4b8c58290d369d60959a0e67f1",
+                "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "rips/connector": "dev-dev"
+                "rips/connector": "~3.0"
             },
             "type": "symfony-bundle",
             "autoload": {
@@ -1240,11 +1245,12 @@
                     "RIPS\\ConnectorBundle\\": ""
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
             "description": "RIPS API Connector bundle for Symfony",
-            "time": "2018-12-20T11:19:26+00:00"
+            "time": "2019-01-04T08:39:43+00:00"
         },
         {
             "name": "sensio/distribution-bundle",
@@ -3401,20 +3407,21 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "1.3.0",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozart/assert.git",
-                "reference": "0df1908962e7a3071564e857d86874dad1ef204a"
+                "reference": "83e253c8e0be5b0257b881e1827274667c5c17a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozart/assert/zipball/0df1908962e7a3071564e857d86874dad1ef204a",
-                "reference": "0df1908962e7a3071564e857d86874dad1ef204a",
+                "url": "https://api.github.com/repos/webmozart/assert/zipball/83e253c8e0be5b0257b881e1827274667c5c17a9",
+                "reference": "83e253c8e0be5b0257b881e1827274667c5c17a9",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.3.3 || ^7.0"
+                "php": "^5.3.3 || ^7.0",
+                "symfony/polyfill-ctype": "^1.8"
             },
             "require-dev": {
                 "phpunit/phpunit": "^4.6",
@@ -3447,15 +3454,12 @@
                 "check",
                 "validate"
             ],
-            "time": "2018-01-29T19:49:41+00:00"
+            "time": "2018-12-25T11:19:39+00:00"
         }
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "rips/connector": 20,
-        "rips/connector-bundle": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
