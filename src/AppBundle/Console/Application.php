@@ -209,6 +209,11 @@ class Application extends BaseApplication
 
         if ($container->hasParameter('console.command.ids')) {
             foreach ($container->getParameter('console.command.ids') as $id) {
+                $wanted = strpos($id, 'console.command.appbundle_command_') === 0 || strpos($id, 'console.command.cache_') === 0;
+                if ($this->kernel->getEnvironment() === 'prod' && !$wanted) {
+                    continue;
+                }
+
                 /** @var Command $command */
                 $command = $container->get($id);
                 $this->add($command);

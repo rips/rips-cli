@@ -24,6 +24,12 @@ class ListSetupCommand extends ContainerAwareCommand
         ;
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     * @throws \Exception
+     */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $helper = $this->getHelper('question');
@@ -63,7 +69,7 @@ class ListSetupCommand extends ContainerAwareCommand
         $columnTable = new Table($output);
         $columnTable->setHeaders(['possible columns']);
         foreach (array_keys($columnDetails) as $column) {
-            $columnTable->addRows([[$column]]);
+            $columnTable->addRow([$column]);
         }
         $columnTable->render();
 
