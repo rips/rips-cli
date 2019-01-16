@@ -73,6 +73,10 @@ class LoginCommand extends ContainerAwareCommand
                 $credentials['password'] = $loginPassword;
             }
 
+            if (!$this->verifyBaseUri($output, $settings['base_uri'])) {
+                return 1;
+            }
+
             $api->initialize($credentials['email'], $credentials['password'], $settings);
         } else {
             if (!$apiUri) {
@@ -96,6 +100,10 @@ class LoginCommand extends ContainerAwareCommand
             };
 
             try {
+                if (!$this->verifyBaseUri($output, $settings['base_uri'])) {
+                    return 1;
+                }
+
                 // Before the credentials are stored the user might want to check them first.
                 $api->initialize($loginEmail, $loginPassword, $settings);
 
@@ -165,5 +173,29 @@ class LoginCommand extends ContainerAwareCommand
         }
 
         return intval($versionParts[0]) === self::MAJOR_VERSION;
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param string $baseUri
+     * @return bool
+     */
+    private function verifyBaseUri(OutputInterface $output, $baseUri)
+    {
+        $output->writeln('<comment>Info:</comment> Verifying base uri ' . $baseUri, OutputInterface::VERBOSITY_VERBOSE);
+
+        if (empty($baseUri)) {
+            $output->writeln('<error>Error:</error> The base uri is empty');
+            return false;
+        }
+
+        $parsedUrl = parse_url($baseUri);
+
+        if (empty($parsedUrl) || empty($parsedUrl['scheme']) || empty($parsedUrl['host'])) {
+            $output->writeln('<error>Error:</error> The base uri ' . $baseUri . ' is not valid');
+            return false;
+        }
+
+        return true;
     }
 }
