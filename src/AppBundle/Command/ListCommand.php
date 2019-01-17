@@ -41,7 +41,7 @@ class ListCommand extends ContainerAwareCommand
     {
         $loginCommand = $this->getApplication()->find('rips:login');
         if ($loginCommand->run(new ArrayInput(['--config' => true]), $output)) {
-            exit(1);
+            return 1;
         }
 
         $helper = $this->getHelper('question');
