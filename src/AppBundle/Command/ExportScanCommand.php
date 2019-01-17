@@ -32,13 +32,14 @@ class ExportScanCommand extends ContainerAwareCommand
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
+     * @return int
      * @throws \Exception
      */
-    public function interact(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output)
     {
         $loginCommand = $this->getApplication()->find('rips:login');
         if ($loginCommand->run(new ArrayInput(['--config' => true]), $output)) {
-            exit(1);
+            return 1;
         }
 
         $helper = $this->getHelper('question');
@@ -62,15 +63,7 @@ class ExportScanCommand extends ContainerAwareCommand
             $fileQuestion = new Question('You may enter a file name (optional): ');
             $input->setOption('file', $helper->ask($input, $output, $fileQuestion));
         }
-    }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
-    public function execute(InputInterface $input, OutputInterface $output)
-    {
         $type = (string)$input->getOption('type');
         $typeData = $this->getType($type);
         $applicationId = (int)$input->getOption('application');

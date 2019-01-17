@@ -23,11 +23,17 @@ class CreateApplicationCommand extends ContainerAwareCommand
         ;
     }
 
-    public function interact(InputInterface $input, OutputInterface $output)
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     * @throws \Exception
+     */
+    public function execute(InputInterface $input, OutputInterface $output)
     {
         $loginCommand = $this->getApplication()->find('rips:login');
         if ($loginCommand->run(new ArrayInput(['--config' => true]), $output)) {
-            exit(1);
+            return 1;
         }
 
         $helper = $this->getHelper('question');
@@ -36,10 +42,7 @@ class CreateApplicationCommand extends ContainerAwareCommand
             $nameQuestion = new Question('Please enter a name: ');
             $input->setOption('name', $helper->ask($input, $output, $nameQuestion));
         }
-    }
 
-    public function execute(InputInterface $input, OutputInterface $output)
-    {
         if (!$input->getOption('name')) {
             $output->writeln('<error>Failure:</error> Name can not be empty');
             return 1;
