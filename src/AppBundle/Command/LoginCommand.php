@@ -50,7 +50,9 @@ class LoginCommand extends ContainerAwareCommand
         /** @var APIService $api */
         $api = $this->getContainer()->get(APIService::class);
 
-        $settings = [];
+        $settings = [
+            'timeout' => 0
+        ];
 
         if (getenv('RIPS_INSECURE_DISABLE_SSL_VERIFICATION')) {
             $output->writeln('<error>Warning:</error> SSL verification is disabled');
