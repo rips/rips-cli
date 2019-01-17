@@ -34,9 +34,10 @@ class ListCommand extends ContainerAwareCommand
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
+     * @return int
      * @throws \Exception
      */
-    public function interact(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output)
     {
         $loginCommand = $this->getApplication()->find('rips:login');
         if ($loginCommand->run(new ArrayInput(['--config' => true]), $output)) {
@@ -49,17 +50,6 @@ class ListCommand extends ContainerAwareCommand
             $tableQuestion = new ChoiceQuestion('Please select a table', $this->getAvailableTables());
             $input->setOption('table', $helper->ask($input, $output, $tableQuestion));
         }
-    }
-
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     * @throws \Exception
-     */
-    public function execute(InputInterface $input, OutputInterface $output)
-    {
-        $helper = $this->getHelper('question');
 
         /** @var TableColumnService $tableColumnService */
         $tableColumnService = $this->getContainer()->get(TableColumnService::class);

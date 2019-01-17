@@ -52,31 +52,6 @@ class StartScanCommand extends ContainerAwareCommand
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @throws \Exception
-     */
-    public function interact(InputInterface $input, OutputInterface $output)
-    {
-        $loginCommand = $this->getApplication()->find('rips:login');
-        if ($loginCommand->run(new ArrayInput(['--config' => true]), $output)) {
-            exit(1);
-        }
-
-        $helper = $this->getHelper('question');
-
-        if (!$input->getOption('path') && !$input->getOption('upload')) {
-            $pathQuestion = new Question('Please enter a path: ');
-            $input->setOption('path', $helper->ask($input, $output, $pathQuestion));
-        }
-
-        if (!$input->getOption('application')) {
-            $applicationQuestion = new Question('Please enter an application id: ');
-            $input->setOption('application', $helper->ask($input, $output, $applicationQuestion));
-        }
-    }
-
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
      * @return int
      * @throws \Exception
      */
@@ -103,6 +78,23 @@ class StartScanCommand extends ContainerAwareCommand
         } elseif ($input->getOption('remove-upload') && $input->getOption('keep-upload')) {
             $output->writeln('<error>Failure:</error> Remove-upload and keep-upload are not compatible');
             return 1;
+        }
+
+        $loginCommand = $this->getApplication()->find('rips:login');
+        if ($loginCommand->run(new ArrayInput(['--config' => true]), $output)) {
+            exit(1);
+        }
+
+        $helper = $this->getHelper('question');
+
+        if (!$input->getOption('path') && !$input->getOption('upload')) {
+            $pathQuestion = new Question('Please enter a path: ');
+            $input->setOption('path', $helper->ask($input, $output, $pathQuestion));
+        }
+
+        if (!$input->getOption('application')) {
+            $applicationQuestion = new Question('Please enter an application id: ');
+            $input->setOption('application', $helper->ask($input, $output, $applicationQuestion));
         }
 
         $scanInput = new ScanBuilder();
