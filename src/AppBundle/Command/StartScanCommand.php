@@ -218,7 +218,7 @@ class StartScanCommand extends ContainerAwareCommand
                 $progress = $scan->getPercent();
                 $phase = $scan->getPhase();
                 $progressBar->setProgress($progress);
-            } while ($progress < 100 || !in_array( $phase, [0, 6, 7], true));
+            } while ($progress < 100 || !in_array($phase, [0, 6, 7], true));
             $progressBar->finish();
         }
 
