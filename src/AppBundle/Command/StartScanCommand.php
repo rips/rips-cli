@@ -3,6 +3,7 @@
 namespace AppBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Filesystem\Filesystem;
 use RIPS\ConnectorBundle\Entities\Application\ScanEntity;
 use RIPS\ConnectorBundle\Entities\Application\UploadEntity;
@@ -46,7 +47,7 @@ class StartScanCommand extends ContainerAwareCommand
             ->addOption('keep-code', 'r', InputOption::VALUE_NONE, 'Keep source code in RIPS once analysis is finished')
             ->addOption('issue-type', 'I', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Override the issue types')
             ->addOption('source', 'S', InputOption::VALUE_REQUIRED, 'Modify the source of the scan', 'rips-cli')
-        ;
+            ->addOption('progress', null, InputOption::VALUE_NONE, 'Show progress bar.');
     }
 
     /**
@@ -172,7 +173,7 @@ class StartScanCommand extends ContainerAwareCommand
                 $envService = $this->getContainer()->get(EnvService::class);
 
                 $languageEnvs = [
-                    'php'  => PhpBuilder::class,
+                    'php' => PhpBuilder::class,
                     'java' => JavaBuilder::class
                 ];
 
@@ -204,6 +205,10 @@ class StartScanCommand extends ContainerAwareCommand
         $scan = $scanService->create($applicationId, $arrayInput)->getScan();
         $output->writeln('<info>Success:</info> Scan "' . $scan->getVersion() . '" (' . $scan->getId() . ') was successfully started at ' . $scan->getStartedAt()->format(DATE_ISO8601));
 
+        if ($input->getOption('progress')) {
+            $this->blockAndShowProgress($output, $scanService, $applicationId, $scan);
+        }
+
         // Wait for scan to finish if user wants an exit code based on the results.
         $thresholds = (array)$input->getOption('threshold');
         if ($thresholds) {
@@ -211,7 +216,7 @@ class StartScanCommand extends ContainerAwareCommand
             $scan = $scanService->blockUntilDone($applicationId, $scan->getId(), 0, 5, [
                 'customFilter' => json_encode([
                     'severityDistribution' => [
-                        'show'               => true,
+                        'show' => true,
                         'negativelyReviewed' => false
                     ]
                 ])
@@ -333,5 +338,29 @@ class StartScanCommand extends ContainerAwareCommand
         }
 
         return $exitCode;
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param ScanService $scanService
+     * @param $applicationId
+     * @param ScanEntity $scan
+     */
+    private function blockAndShowProgress(OutputInterface $output, ScanService $scanService, $applicationId, ScanEntity $scan)
+    {
+        $progressBar = new ProgressBar($output, 100);
+        $progressBar->setFormat("Progress: [%bar%] %percent%%");
+
+        $progressBar->start();
+
+        // Loop and update progress until we hit 100% or the scan's phase is an exit phase.
+        do {
+            sleep(5);
+            $scan = $scanService->getById($applicationId, $scan->getId())->getScan();
+            $progress = $scan->getPercent();
+            $phase = $scan->getPhase();
+            $progressBar->setProgress($progress);
+        } while ($progress < 100 || !in_array($phase, [0, 6, 7], true));
+        $progressBar->finish();
     }
 }
