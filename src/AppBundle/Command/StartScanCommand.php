@@ -206,20 +206,7 @@ class StartScanCommand extends ContainerAwareCommand
         $output->writeln('<info>Success:</info> Scan "' . $scan->getVersion() . '" (' . $scan->getId() . ') was successfully started at ' . $scan->getStartedAt()->format(DATE_ISO8601));
 
         if ($input->getOption('progress')) {
-            $progressBar = new ProgressBar($output, 100);
-            $progressBar->setFormat("Progress: [%bar%] %percent%%");
-
-            $progressBar->start();
-
-            // Loop and update progress until we hit 100% or the scan's phase is an exit phase.
-            do {
-                sleep(5);
-                $scan = $scanService->getById($applicationId, $scan->getId())->getScan();
-                $progress = $scan->getPercent();
-                $phase = $scan->getPhase();
-                $progressBar->setProgress($progress);
-            } while ($progress < 100 || !in_array($phase, [0, 6, 7], true));
-            $progressBar->finish();
+            $this->blockAndShowProgress($output, $scanService, $applicationId, $scan);
         }
 
         // Wait for scan to finish if user wants an exit code based on the results.
@@ -351,5 +338,29 @@ class StartScanCommand extends ContainerAwareCommand
         }
 
         return $exitCode;
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param ScanService $scanService
+     * @param $applicationId
+     * @param ScanEntity $scan
+     */
+    private function blockAndShowProgress(OutputInterface $output, ScanService $scanService, $applicationId, ScanEntity $scan)
+    {
+        $progressBar = new ProgressBar($output, 100);
+        $progressBar->setFormat("Progress: [%bar%] %percent%%");
+
+        $progressBar->start();
+
+        // Loop and update progress until we hit 100% or the scan's phase is an exit phase.
+        do {
+            sleep(5);
+            $scan = $scanService->getById($applicationId, $scan->getId())->getScan();
+            $progress = $scan->getPercent();
+            $phase = $scan->getPhase();
+            $progressBar->setProgress($progress);
+        } while ($progress < 100 || !in_array($phase, [0, 6, 7], true));
+        $progressBar->finish();
     }
 }
