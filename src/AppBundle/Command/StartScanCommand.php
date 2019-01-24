@@ -343,7 +343,7 @@ class StartScanCommand extends ContainerAwareCommand
     /**
      * @param OutputInterface $output
      * @param ScanService $scanService
-     * @param $applicationId
+     * @param int $applicationId
      * @param ScanEntity $scan
      */
     private function blockAndShowProgress(OutputInterface $output, ScanService $scanService, $applicationId, ScanEntity $scan)
@@ -360,7 +360,7 @@ class StartScanCommand extends ContainerAwareCommand
             $progress = $scan->getPercent();
             $phase = $scan->getPhase();
             $progressBar->setProgress($progress);
-        } while ($progress < 100 || !in_array($phase, [0, 6, 7], true));
+        } while ($progress < 100 && !in_array($phase, [0, 6, 7], true));
         $progressBar->finish();
     }
 }
