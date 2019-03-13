@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Command;
 
+use AppBundle\Service\ArchiveService;
 use RIPS\ConnectorBundle\Services\LanguageService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -17,6 +18,7 @@ class CleanZipCommand extends ContainerAwareCommand
             ->setName('rips:clean-zip')
             ->setDescription('Create a zip file containing only the files with handled extensions')
             ->addOption('path', 'p', InputOption::VALUE_REQUIRED, 'Path to folder')
+            ->addOption('output-path', 'o', InputOption::VALUE_REQUIRED, 'Path to which the resulting archive should be saved')
             ->addOption('extensions', 'E',
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Extensions')
             ;
@@ -47,6 +49,16 @@ class CleanZipCommand extends ContainerAwareCommand
             return 1;
         }
 
+        if (!$input->getOption('output-path')) {
+            $pathQuestion = new Question('Please enter a path to which the archive should be saved: ');
+            $input->setOption('output-path', $helper->ask($input, $output, $pathQuestion));
+        }
+
+        if (!$input->getOption('output-path')) {
+            $output->writeln('<error>Failure:</error> Output path can not be empty');
+            return 1;
+        }
+
         if (!$input->getOption('extensions')) {
             /** @var $languagesService $languagesService */
             $languagesService = $this->getContainer()->get(LanguageService::class);
@@ -55,10 +67,18 @@ class CleanZipCommand extends ContainerAwareCommand
         }
 
         $path = $input->getOption('path');
-        $tmpZip = new \ZipArchive();
+        /** @var ArchiveService $archiveService */
+        $archiveService = $this->getContainer()->get(ArchiveService::class);
+
         if (is_dir($path)) {
-            // TODO: Create zip out of zip
-        } elseif (is_file($path) && ($tmpZip->open($path))) {
+            $archiveService->setFileExtensions($input->getOption('extensions'));
+            try {
+                $path = $archiveService->folderToArchive($path, [], $input->getOption('output-path'));
+            } catch (\Exception $e) {
+                $output->writeln('<error>Failure:</error> ' . $e->getMessage());
+                return 1;
+            }
+        } elseif ($archiveService->isArchive($path)) {
             // TODO: Create new zip out of zip
         } else {
             $output->writeln('<error>Failure:</error> Path is neither a folder nor a ZIP file');

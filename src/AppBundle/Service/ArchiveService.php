@@ -52,13 +52,16 @@ class ArchiveService
      *
      * @param string $path
      * @param array $excludePaths
+     * @param string $archivePath
      * @return string
      * @throws \Exception if archive can not be created
      */
-    public function folderToArchive($path, array $excludePaths = [])
+    public function folderToArchive($path, array $excludePaths = [], $archivePath = "")
     {
         $zip = new \ZipArchive();
-        $archivePath = tempnam(sys_get_temp_dir(), 'RIPS');
+        if (!$archivePath) {
+            $archivePath = tempnam(sys_get_temp_dir(), 'RIPS');
+        }
         $archiveCounter = 0;
 
         if ($zip->open($archivePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
