@@ -115,7 +115,7 @@ class ArchiveService
 
     /**
      * The purpose of this method is to transform a given zip into another zip taking into account $this->fileExtensions
-     * and $excludePaths
+     * and $excludePaths.
      *
      * @param string $path
      * @param array $excludePaths
