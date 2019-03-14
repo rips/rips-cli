@@ -40,6 +40,7 @@ return [
     "exclude_analysis_directory_list" => [
         'vendor/',
         'src/AppBundle/Command/Cache/',
+        'src/AppBundle/Service/ArchiveService.php'
     ],
 
     // The minimum severity level to report on. This can be
