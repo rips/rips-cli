@@ -114,6 +114,9 @@ class ArchiveService
     }
 
     /**
+     * The purpose of this method is to transform a given zip into another zip taking into account $this->fileExtensions
+     * and $excludePaths
+     *
      * @param string $path
      * @param array $excludePaths
      * @param string $archivePath
@@ -147,6 +150,6 @@ class ArchiveService
             throw new \Exception('Extracting files to temporary directory failed');
         }
 
-        $this->folderToArchive($tmpFolder, [], $archivePath);
+        $this->folderToArchive($tmpFolder, $excludePaths, $archivePath);
     }
 }
