@@ -69,17 +69,22 @@ class CleanZipCommand extends ContainerAwareCommand
         $path = $input->getOption('path');
         /** @var ArchiveService $archiveService */
         $archiveService = $this->getContainer()->get(ArchiveService::class);
+        $archiveService->setFileExtensions($input->getOption('extensions'));
 
         if (is_dir($path)) {
-            $archiveService->setFileExtensions($input->getOption('extensions'));
             try {
-                $path = $archiveService->folderToArchive($path, [], $input->getOption('output-path'));
+                $archiveService->folderToArchive($path, [], $input->getOption('output-path'));
             } catch (\Exception $e) {
                 $output->writeln('<error>Failure:</error> ' . $e->getMessage());
                 return 1;
             }
         } elseif ($archiveService->isArchive($path)) {
-            // TODO: Create new zip out of zip
+            try {
+                $archiveService->archiveToArchive($path, [], $input->getOption('output-path'));
+            } catch (\Exception $e) {
+                $output->writeln('<error>Failure:</error> ' . $e->getMessage());
+                return 1;
+            }
         } else {
             $output->writeln('<error>Failure:</error> Path is neither a folder nor a ZIP file');
             return 1;

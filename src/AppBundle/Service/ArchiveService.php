@@ -112,4 +112,41 @@ class ArchiveService
 
         return $archivePath;
     }
+
+    /**
+     * @param $path
+     * @param array $excludePaths
+     * @param string $archivePath
+     * @throws \Exception
+     */
+    public function archiveToArchive($path, array $excludePaths = [], $archivePath = "")
+    {
+        $inputZip = new \ZipArchive();
+
+        if ($inputZip->open($path) !== true) {
+            throw new \Exception('Opening zip archive failed');
+        }
+
+        $toExtract = [];
+        for ($i = 0; $i < $inputZip->numFiles; $i++) {
+            $file = $inputZip->getNameIndex($i);
+            $pathInfo = pathinfo($file);
+
+            if (isset($pathInfo['extension']) && in_array($pathInfo['extension'], $this->fileExtensions)) {
+                $toExtract[] = $file;
+            }
+        }
+
+        $tmpFolder = tempnam(sys_get_temp_dir(),'RIPS');
+        unlink($tmpFolder); // tempnam creates a file, we cheat and turn that into a folder
+        if (mkdir($tmpFolder) === false) {
+            throw new \Exception('Creating folder for temporary files extraction failed');
+        }
+
+        if ($inputZip->extractTo($tmpFolder, $toExtract) === false) {
+            throw new \Exception('Extracting files to temporary directory failed');
+        }
+
+        $this->folderToArchive($tmpFolder, [], $archivePath);
+    }
 }
