@@ -11,7 +11,7 @@ RUN \
   rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions that are not available through APT.
-RUN pecl install ast
+RUN pecl install ast-0.1.6
 COPY configs/20-ast.ini /etc/php/7.2/cli/conf.d/20-ast.ini
 
 # Install NodeJS/NPM.
@@ -27,7 +27,7 @@ USER nobody
 WORKDIR /tmp
 RUN \
   php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
-  php -r "if (hash_file('SHA384', 'composer-setup.php') !== '544e09ee996cdf60ece3804abc52599c22b1f40f4323403c44d44fdfdd586475ca9813a858088ffbc1f233e9b180f061') { unlink('composer-setup.php'); }" && \
+  php -r "if (hash_file('SHA384', 'composer-setup.php') !== '48e3236262b34d30969dca3c37281b3b4bbe3221bda826ac6a9a62d6444cdb0dcd0615698a5cbe587c3f0fe57a54d8f5') { unlink('composer-setup.php'); }" && \
   HOME="/tmp" php composer-setup.php && \
   php -r "unlink('composer-setup.php');"
 

@@ -114,7 +114,7 @@ class ArchiveService
     }
 
     /**
-     * @param $path
+     * @param string $path
      * @param array $excludePaths
      * @param string $archivePath
      * @throws \Exception
@@ -137,7 +137,7 @@ class ArchiveService
             }
         }
 
-        $tmpFolder = tempnam(sys_get_temp_dir(),'RIPS');
+        $tmpFolder = tempnam(sys_get_temp_dir(), 'RIPS');
         unlink($tmpFolder); // tempnam creates a file, we cheat and turn that into a folder
         if (mkdir($tmpFolder) === false) {
             throw new \Exception('Creating folder for temporary files extraction failed');

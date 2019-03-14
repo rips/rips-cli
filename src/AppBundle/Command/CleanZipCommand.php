@@ -19,12 +19,24 @@ class CleanZipCommand extends ContainerAwareCommand
             ->setName('rips:clean-zip')
             ->setDescription('Create a zip file containing only the files with handled extensions')
             ->addOption('path', 'p', InputOption::VALUE_REQUIRED, 'Path to folder')
-            ->addOption('language', 'l', InputOption::VALUE_REQUIRED,
-                'Language that will be scanned (name or ID)')
-            ->addOption('output-path', 'o', InputOption::VALUE_REQUIRED,
-                'Path to which the resulting archive should be saved')
-            ->addOption('extensions', 'E',
-                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Extensions');
+            ->addOption(
+                'language',
+                'l',
+                InputOption::VALUE_REQUIRED,
+                'Language that will be scanned (name or ID)'
+            )
+            ->addOption(
+                'output-path',
+                'o',
+                InputOption::VALUE_REQUIRED,
+                'Path to which the resulting archive should be saved'
+            )
+            ->addOption(
+                'extensions',
+                'E',
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Extensions'
+            );
     }
 
     /**
@@ -62,8 +74,8 @@ class CleanZipCommand extends ContainerAwareCommand
             return 1;
         }
 
-        if (!$input->getOption('extensions')) {
-            /** @var $languagesService $languagesService */
+        if (!$input->getOption('extensions') || !is_array($input->getOption('extensions'))) {
+            /** @var LanguageService $languagesService */
             $languagesService = $this->getContainer()->get(LanguageService::class);
             $languages = $languagesService->getAll()->getLanguages();
             $extensions = $this->extractExtensions($languages, $input->getOption("language"));
@@ -80,21 +92,21 @@ class CleanZipCommand extends ContainerAwareCommand
             $input->setOption('extensions', $extensions);
         }
 
-        $path = $input->getOption('path');
+        $path = (string)$input->getOption('path');
         /** @var ArchiveService $archiveService */
         $archiveService = $this->getContainer()->get(ArchiveService::class);
-        $archiveService->setFileExtensions($input->getOption('extensions'));
+        $archiveService->setFileExtensions((array)$input->getOption('extensions'));
 
         if (is_dir($path)) {
             try {
-                $archiveService->folderToArchive($path, [], $input->getOption('output-path'));
+                $archiveService->folderToArchive($path, [], (string)$input->getOption('output-path'));
             } catch (\Exception $e) {
                 $output->writeln('<error>Failure:</error> ' . $e->getMessage());
                 return 1;
             }
         } elseif ($archiveService->isArchive($path)) {
             try {
-                $archiveService->archiveToArchive($path, [], $input->getOption('output-path'));
+                $archiveService->archiveToArchive($path, [], (string)$input->getOption('output-path'));
             } catch (\Exception $e) {
                 $output->writeln('<error>Failure:</error> ' . $e->getMessage());
                 return 1;
@@ -109,8 +121,8 @@ class CleanZipCommand extends ContainerAwareCommand
 
     /**
      * @param \RIPS\ConnectorBundle\Entities\LanguageEntity[] $languages
-     * @param string|int|null $chosenLanguage
-     * @return bool|array
+     * @param string[]|bool|string|int|null $chosenLanguage
+     * @return bool|string[]
      */
     private function extractExtensions($languages, $chosenLanguage = null)
     {
