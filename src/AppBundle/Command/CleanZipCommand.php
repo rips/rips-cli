@@ -74,11 +74,16 @@ class CleanZipCommand extends ContainerAwareCommand
             return 1;
         }
 
+        $language = $input->getOption("language");
+        if (!is_string($language)) {
+            $language = null;
+        }
+
         if (!$input->getOption('extensions') || !is_array($input->getOption('extensions'))) {
             /** @var LanguageService $languagesService */
             $languagesService = $this->getContainer()->get(LanguageService::class);
             $languages = $languagesService->getAll()->getLanguages();
-            $extensions = $this->extractExtensions($languages, $input->getOption("language"));
+            $extensions = $this->extractExtensions($languages, $language);
             if ($extensions === false) {
                 $languageNames = array_map(function ($language) {
                     return strtolower($language->getName());
@@ -121,7 +126,7 @@ class CleanZipCommand extends ContainerAwareCommand
 
     /**
      * @param \RIPS\ConnectorBundle\Entities\LanguageEntity[] $languages
-     * @param string[]|bool|string|int|null $chosenLanguage
+     * @param string|null $chosenLanguage
      * @return bool|string[]
      */
     private function extractExtensions($languages, $chosenLanguage = null)
