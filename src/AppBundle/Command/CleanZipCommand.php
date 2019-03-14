@@ -1,4 +1,5 @@
 <?php
+
 namespace AppBundle\Command;
 
 use AppBundle\Service\ArchiveService;
@@ -18,10 +19,12 @@ class CleanZipCommand extends ContainerAwareCommand
             ->setName('rips:clean-zip')
             ->setDescription('Create a zip file containing only the files with handled extensions')
             ->addOption('path', 'p', InputOption::VALUE_REQUIRED, 'Path to folder')
-            ->addOption('output-path', 'o', InputOption::VALUE_REQUIRED, 'Path to which the resulting archive should be saved')
+            ->addOption('language', 'l', InputOption::VALUE_REQUIRED,
+                'Language that will be scanned (name or ID)')
+            ->addOption('output-path', 'o', InputOption::VALUE_REQUIRED,
+                'Path to which the resulting archive should be saved')
             ->addOption('extensions', 'E',
-                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Extensions')
-            ;
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Extensions');
     }
 
     /**
@@ -63,7 +66,18 @@ class CleanZipCommand extends ContainerAwareCommand
             /** @var $languagesService $languagesService */
             $languagesService = $this->getContainer()->get(LanguageService::class);
             $languages = $languagesService->getAll()->getLanguages();
-            $input->setOption('extensions', $this->extractExtensions($languages));
+            $extensions = $this->extractExtensions($languages, $input->getOption("language"));
+            if ($extensions === false) {
+                $languageNames = array_map(function ($language) {
+                    return strtolower($language->getName());
+                }, $languages);
+                $output->writeln(
+                    '<error>Failure:</error> The specified language did not match any available language. Available: '
+                    . implode(', ', $languageNames)
+                );
+                return 1;
+            }
+            $input->setOption('extensions', $extensions);
         }
 
         $path = $input->getOption('path');
@@ -90,20 +104,32 @@ class CleanZipCommand extends ContainerAwareCommand
             return 1;
         }
 
-
         return 0;
     }
 
     /**
      * @param \RIPS\ConnectorBundle\Entities\LanguageEntity[] $languages
-     * @return array
+     * @param string|int|null $chosenLanguage
+     * @return bool|array
      */
-    private function extractExtensions($languages)
+    private function extractExtensions($languages, $chosenLanguage = null)
     {
         $result = [];
+        $matched = false;
         foreach ($languages as $language) {
+            if ($chosenLanguage !== null &&
+                (string)$language->getId() !== $chosenLanguage &&
+                strtolower($language->getName()) !== strtolower($chosenLanguage)) {
+                continue;
+            }
+            $matched = true;
             $result = array_merge($language->getFileExtensions(), $result);
         }
+
+        if ($chosenLanguage !== null && $matched === false) {
+            return false;
+        }
+
         return $result;
     }
 }
