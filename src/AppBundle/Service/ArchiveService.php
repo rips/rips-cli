@@ -120,6 +120,7 @@ class ArchiveService
      * @param string $path
      * @param array $excludePaths
      * @param string $archivePath
+     * @return string
      * @throws \Exception
      */
     public function archiveToArchive($path, array $excludePaths = [], $archivePath = "")
@@ -150,6 +151,6 @@ class ArchiveService
             throw new \Exception('Extracting files to temporary directory failed');
         }
 
-        $this->folderToArchive($tmpFolder, $excludePaths, $archivePath);
+        return $this->folderToArchive($tmpFolder, $excludePaths, $archivePath);
     }
 }
