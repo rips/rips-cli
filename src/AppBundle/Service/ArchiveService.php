@@ -52,13 +52,16 @@ class ArchiveService
      *
      * @param string $path
      * @param array $excludePaths
+     * @param string $archivePath
      * @return string
      * @throws \Exception if archive can not be created
      */
-    public function folderToArchive($path, array $excludePaths = [])
+    public function folderToArchive($path, array $excludePaths = [], $archivePath = "")
     {
         $zip = new \ZipArchive();
-        $archivePath = tempnam(sys_get_temp_dir(), 'RIPS');
+        if (!$archivePath) {
+            $archivePath = tempnam(sys_get_temp_dir(), 'RIPS');
+        }
         $archiveCounter = 0;
 
         if ($zip->open($archivePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
@@ -108,5 +111,46 @@ class ArchiveService
         }
 
         return $archivePath;
+    }
+
+    /**
+     * The purpose of this method is to transform a given zip into another zip taking into account $this->fileExtensions
+     * and $excludePaths.
+     *
+     * @param string $path
+     * @param array $excludePaths
+     * @param string $archivePath
+     * @return string
+     * @throws \Exception
+     */
+    public function archiveToArchive($path, array $excludePaths = [], $archivePath = "")
+    {
+        $inputZip = new \ZipArchive();
+
+        if ($inputZip->open($path) !== true) {
+            throw new \Exception('Opening zip archive failed');
+        }
+
+        $toExtract = [];
+        for ($i = 0; $i < $inputZip->numFiles; $i++) {
+            $file = $inputZip->getNameIndex($i);
+            $pathInfo = pathinfo($file);
+
+            if (isset($pathInfo['extension']) && in_array($pathInfo['extension'], $this->fileExtensions)) {
+                $toExtract[] = $file;
+            }
+        }
+
+        $tmpFolder = tempnam(sys_get_temp_dir(), 'RIPS');
+        unlink($tmpFolder); // tempnam creates a file, we cheat and turn that into a folder
+        if (mkdir($tmpFolder) === false) {
+            throw new \Exception('Creating folder for temporary files extraction failed');
+        }
+
+        if ($inputZip->extractTo($tmpFolder, $toExtract) === false) {
+            throw new \Exception('Extracting files to temporary directory failed');
+        }
+
+        return $this->folderToArchive($tmpFolder, $excludePaths, $archivePath);
     }
 }
