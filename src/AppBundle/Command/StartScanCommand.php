@@ -277,8 +277,7 @@ class StartScanCommand extends ContainerAwareCommand
             $archivePath = $path;
             $removeZip = false;
              // If it is a .zip, upload a cleaned version.
-            $pathInfo = pathinfo($archivePath);
-            if (isset($pathInfo['extension']) && $pathInfo['extension'] === 'zip') {
+            if ($archiveService->isZipArchive($archivePath)) {
                 $archivePath = $archiveService->archiveToArchive($archivePath, $excludePath);
                 $removeZip = true;
             }

@@ -48,6 +48,15 @@ class ArchiveService
     }
 
     /**
+     * @param string $path
+     * @return bool
+     */
+    public function isZipArchive($path)
+    {
+        return $this->isArchive($path) && pathinfo($path, PATHINFO_EXTENSION) === 'zip';
+    }
+
+    /**
      * Creates zip archive from path and returns path to zip.
      *
      * @param string $path
