@@ -282,7 +282,6 @@ class StartScanCommand extends ContainerAwareCommand
                 $archivePath = $archiveService->archiveToArchive($path, $excludePath);
                 $removeZip = true;
             }
-
         }
 
         /** @var UploadService $uploadService */
