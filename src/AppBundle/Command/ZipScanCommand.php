@@ -17,7 +17,7 @@ class ZipScanCommand extends ContainerAwareCommand
     {
         $this
             ->setName('rips:scan:zip')
-            ->setDescription('Create a zip file for RIPS scans')
+            ->setDescription('Create a clean zip file for scanning')
             ->addOption('path', 'p', InputOption::VALUE_REQUIRED, 'Path to zip file or folder with source code')
             ->addOption(
                 'language',
