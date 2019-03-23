@@ -11,14 +11,14 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
-class CleanZipCommand extends ContainerAwareCommand
+class ZipScanCommand extends ContainerAwareCommand
 {
     public function configure()
     {
         $this
-            ->setName('rips:clean-zip')
-            ->setDescription('Create a zip file containing only the files with handled extensions')
-            ->addOption('path', 'p', InputOption::VALUE_REQUIRED, 'Path to folder')
+            ->setName('rips:scan:zip')
+            ->setDescription('Create a zip file for RIPS scans')
+            ->addOption('path', 'p', InputOption::VALUE_REQUIRED, 'Path to zip file or folder with source code')
             ->addOption(
                 'language',
                 'l',
@@ -35,7 +35,7 @@ class CleanZipCommand extends ContainerAwareCommand
                 'extensions',
                 'E',
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Extensions'
+                'Overrides the file extensions'
             );
     }
 
