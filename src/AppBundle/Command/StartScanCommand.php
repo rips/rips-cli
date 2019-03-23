@@ -103,7 +103,7 @@ class StartScanCommand extends ContainerAwareCommand
         if ($input->getOption('name')) {
             $scanInput->setVersion((string)$input->getOption('name'));
         } else {
-            $scanInput->setVersion(date(DATE_ISO8601));
+            $scanInput->setVersion(date('Y-m-d H:i'));
         }
 
         if ($input->getOption('remove-upload')) {
