@@ -39,7 +39,7 @@ class Application extends BaseApplication
     }
 
     /**
-     * @return false|string
+     * @return string
      */
     private function getVersionFromFile()
     {
