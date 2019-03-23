@@ -22,7 +22,7 @@ class Application extends BaseApplication
     {
         $this->kernel = $kernel;
 
-        parent::__construct('rips-cli');
+        parent::__construct('rips-cli', $this->getVersionFromFile());
 
         $this->getDefinition()->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The environment name', $kernel->getEnvironment()));
         $this->getDefinition()->addOption(new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switches off debug mode'));
@@ -36,6 +36,19 @@ class Application extends BaseApplication
     public function getKernel()
     {
         return $this->kernel;
+    }
+
+    /**
+     * @return false|string
+     */
+    private function getVersionFromFile()
+    {
+        $versionFile = $this->kernel->getRootDir() . '/../version.txt';
+        if (file_exists($versionFile)) {
+            return file_get_contents($versionFile);
+        } else {
+            return '3';
+        }
     }
 
     /**
