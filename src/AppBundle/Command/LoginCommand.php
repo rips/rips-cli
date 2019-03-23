@@ -176,10 +176,6 @@ class LoginCommand extends ContainerAwareCommand
         $version = $status->getVersion();
         $versionParts = explode('.', $version);
 
-        if (count($versionParts) !== 3) {
-            throw new \RuntimeException('Malformed API version');
-        }
-
         return intval($versionParts[0]) === self::MAJOR_VERSION;
     }
 

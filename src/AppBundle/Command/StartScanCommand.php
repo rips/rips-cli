@@ -309,6 +309,13 @@ class StartScanCommand extends ContainerAwareCommand
         $severityDistributions = json_decode(json_encode($scan->getSeverityDistributions()['total']), true);
         $severityDistributions['sum'] = array_sum($severityDistributions);
 
+        $severityDistributionsNew = json_decode(json_encode($scan->getSeverityDistributions()['new']), true);
+        $severityDistributions['new'] = array_sum($severityDistributionsNew);
+        $severityDistributions['new-critical'] = $severityDistributionsNew['critical'];
+        $severityDistributions['new-high'] = $severityDistributionsNew['high'];
+        $severityDistributions['new-medium'] = $severityDistributionsNew['medium'];
+        $severityDistributions['new-low'] = $severityDistributionsNew['low'];
+
         $exitCode = 0;
         foreach ($thresholds as $threshold) {
             // Turn numbers into sum for backwards compatibility.
