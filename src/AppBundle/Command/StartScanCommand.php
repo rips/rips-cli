@@ -47,7 +47,8 @@ class StartScanCommand extends ContainerAwareCommand
             ->addOption('keep-code', 'r', InputOption::VALUE_NONE, 'Keep source code in RIPS once analysis is finished')
             ->addOption('issue-type', 'I', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Override the issue types')
             ->addOption('source', 'S', InputOption::VALUE_REQUIRED, 'Modify the source of the scan', 'rips-cli')
-            ->addOption('progress', null, InputOption::VALUE_NONE, 'Show progress bar.');
+            ->addOption('progress', 'G', InputOption::VALUE_NONE, 'Show progress bar')
+        ;
     }
 
     /**
