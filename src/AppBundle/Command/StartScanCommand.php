@@ -3,6 +3,7 @@
 namespace AppBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Filesystem\Filesystem;
 use RIPS\ConnectorBundle\Entities\Application\ScanEntity;
 use RIPS\ConnectorBundle\Entities\Application\UploadEntity;
@@ -46,6 +47,7 @@ class StartScanCommand extends ContainerAwareCommand
             ->addOption('keep-code', 'r', InputOption::VALUE_NONE, 'Keep source code in RIPS once analysis is finished')
             ->addOption('issue-type', 'I', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Override the issue types')
             ->addOption('source', 'S', InputOption::VALUE_REQUIRED, 'Modify the source of the scan', 'rips-cli')
+            ->addOption('progress', 'G', InputOption::VALUE_NONE, 'Show progress bar')
         ;
     }
 
@@ -102,7 +104,7 @@ class StartScanCommand extends ContainerAwareCommand
         if ($input->getOption('name')) {
             $scanInput->setVersion((string)$input->getOption('name'));
         } else {
-            $scanInput->setVersion(date(DATE_ISO8601));
+            $scanInput->setVersion(date('Y-m-d H:i'));
         }
 
         if ($input->getOption('remove-upload')) {
@@ -172,7 +174,7 @@ class StartScanCommand extends ContainerAwareCommand
                 $envService = $this->getContainer()->get(EnvService::class);
 
                 $languageEnvs = [
-                    'php'  => PhpBuilder::class,
+                    'php' => PhpBuilder::class,
                     'java' => JavaBuilder::class
                 ];
 
@@ -204,6 +206,10 @@ class StartScanCommand extends ContainerAwareCommand
         $scan = $scanService->create($applicationId, $arrayInput)->getScan();
         $output->writeln('<info>Success:</info> Scan "' . $scan->getVersion() . '" (' . $scan->getId() . ') was successfully started at ' . $scan->getStartedAt()->format(DATE_ISO8601));
 
+        if ($input->getOption('progress')) {
+            $this->blockAndShowProgress($output, $scanService, $applicationId, $scan);
+        }
+
         // Wait for scan to finish if user wants an exit code based on the results.
         $thresholds = (array)$input->getOption('threshold');
         if ($thresholds) {
@@ -211,7 +217,7 @@ class StartScanCommand extends ContainerAwareCommand
             $scan = $scanService->blockUntilDone($applicationId, $scan->getId(), 0, 5, [
                 'customFilter' => json_encode([
                     'severityDistribution' => [
-                        'show'               => true,
+                        'show' => true,
                         'negativelyReviewed' => false
                     ]
                 ])
@@ -268,9 +274,14 @@ class StartScanCommand extends ContainerAwareCommand
             $archiveName = basename($archivePath) . '.zip';
             $removeZip = true;
         } else {
+            $archiveName = basename($path);
             $archivePath = $path;
-            $archiveName = basename($archivePath);
             $removeZip = false;
+             // If it is a .zip, upload a cleaned version.
+            if ($archiveService->isZipArchive($archivePath)) {
+                $archivePath = $archiveService->archiveToArchive($archivePath, $excludePath);
+                $removeZip = true;
+            }
         }
 
         /** @var UploadService $uploadService */
@@ -298,6 +309,13 @@ class StartScanCommand extends ContainerAwareCommand
     {
         $severityDistributions = json_decode(json_encode($scan->getSeverityDistributions()['total']), true);
         $severityDistributions['sum'] = array_sum($severityDistributions);
+
+        $severityDistributionsNew = json_decode(json_encode($scan->getSeverityDistributions()['new']), true);
+        $severityDistributions['new'] = array_sum($severityDistributionsNew);
+        $severityDistributions['new-critical'] = $severityDistributionsNew['critical'];
+        $severityDistributions['new-high'] = $severityDistributionsNew['high'];
+        $severityDistributions['new-medium'] = $severityDistributionsNew['medium'];
+        $severityDistributions['new-low'] = $severityDistributionsNew['low'];
 
         $exitCode = 0;
         foreach ($thresholds as $threshold) {
@@ -333,5 +351,29 @@ class StartScanCommand extends ContainerAwareCommand
         }
 
         return $exitCode;
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @param ScanService $scanService
+     * @param int $applicationId
+     * @param ScanEntity $scan
+     */
+    private function blockAndShowProgress(OutputInterface $output, ScanService $scanService, $applicationId, ScanEntity $scan)
+    {
+        $progressBar = new ProgressBar($output, 100);
+        $progressBar->setFormat("Progress: [%bar%] %percent%%");
+
+        $progressBar->start();
+
+        // Loop and update progress until we hit 100% or the scan's phase is an exit phase.
+        do {
+            sleep(5);
+            $scan = $scanService->getById($applicationId, $scan->getId())->getScan();
+            $progress = $scan->getPercent();
+            $phase = $scan->getPhase();
+            $progressBar->setProgress($progress);
+        } while ($progress < 100 && !in_array($phase, [0, 6, 7], true));
+        $progressBar->finish();
     }
 }

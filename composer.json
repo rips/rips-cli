@@ -27,7 +27,7 @@
         "sensio/distribution-bundle": "^5.0.24",
         "symfony/framework-bundle": "^3.4.19",
         "sensio/framework-extra-bundle": "^5.2.4",
-        "symfony/symfony": "3.4.*"
+        "symfony/symfony": "^3.4.20"
     },
     "require-dev": {
         "phan/phan": "^0.12.2",
