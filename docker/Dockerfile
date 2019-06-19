@@ -3,7 +3,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN \
   apt-get update && \
-  apt-get install libzip-dev -y && \
+  apt-get install libzip-dev git -y && \
   rm -rf /var/lib/apt/lists/* && \
   docker-php-ext-configure zip --with-libdir=lib/x86_64-linux-gnu/ && \
   docker-php-ext-install zip
