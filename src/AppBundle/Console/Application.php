@@ -2,6 +2,7 @@
 
 namespace AppBundle\Console;
 
+use AppBundle\Command\LoginCommand;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
@@ -47,7 +48,7 @@ class Application extends BaseApplication
         if (file_exists($versionFile)) {
             return file_get_contents($versionFile);
         } else {
-            return '3';
+            return LoginCommand::MAJOR_VERSION;
         }
     }
 
