@@ -30,7 +30,7 @@
         "symfony/symfony": "^3.4.20"
     },
     "require-dev": {
-        "phan/phan": "^0.12.2",
+        "phan/phan": "^1.1.7",
         "phpstan/phpstan": "^0.9.2",
         "sensio/generator-bundle": "^3.0",
         "squizlabs/php_codesniffer": "^3.2",
