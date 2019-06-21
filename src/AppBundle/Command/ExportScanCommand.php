@@ -96,7 +96,7 @@ class ExportScanCommand extends ContainerAwareCommand
      */
     private function getType($type)
     {
-        $types = $this->getContainer()->getParameter(self::EXPORT_TYPES_PARAMETER);
+        $types = $this->getTypes();
 
         if (!isset($types[$type])) {
             $availableTypes = $this->getAvailableTypes();
