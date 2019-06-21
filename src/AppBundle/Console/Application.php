@@ -48,7 +48,7 @@ class Application extends BaseApplication
         if (file_exists($versionFile)) {
             return file_get_contents($versionFile);
         } else {
-            return LoginCommand::MAJOR_VERSION;
+            return (string)LoginCommand::MAJOR_VERSION;
         }
     }
 
