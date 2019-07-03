@@ -23,7 +23,7 @@
         "php": ">=5.5.9",
         "ext-json": "*",
         "phpmetrics/phpmetrics": "^2.4",
-        "rips/connector-bundle": "~3.0",
+        "rips/connector-bundle": "~3.2",
         "sensio/distribution-bundle": "^5.0.24",
         "symfony/framework-bundle": "^3.4.19",
         "sensio/framework-extra-bundle": "^5.2.4",
