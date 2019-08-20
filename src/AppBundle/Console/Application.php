@@ -102,18 +102,10 @@ class Application extends BaseApplication
                     break;
             }
 
-            $decoded = json_decode($e->getMessage(), true);
+            $output->writeln(' ' . $e->getMessage());
 
-            if ($decoded) {
-                if (isset($decoded['message']) && is_string($decoded['message'])) {
-                    $output->writeln(' ' . $decoded['message']);
-                }
-
-                if (isset($decoded['errors']) && is_array($decoded['errors'])) {
-                    $output->writeln("\n" . print_r($decoded['errors'], true));
-                }
-            } else {
-                $output->writeln('');
+            if ($e->getErrors()) {
+                $output->writeln("\n" . print_r($e->getErrors(), true));
             }
 
             return 1;
@@ -127,15 +119,7 @@ class Application extends BaseApplication
                     break;
             }
 
-            $decoded = json_decode($e->getMessage(), true);
-
-            if ($decoded) {
-                if (isset($decoded['message']) && is_string($decoded['message'])) {
-                    $output->writeln(' ' . $decoded['message']);
-                }
-            } else {
-                $output->writeln('');
-            }
+            $output->writeln(' ' . $e->getMessage());
 
             $output->writeln('To resolve this issue please try to rerun the command.');
             $output->writeln('If this does not resolve the problem you should try to decrease the');
