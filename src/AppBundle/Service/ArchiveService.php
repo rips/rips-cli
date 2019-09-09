@@ -99,8 +99,8 @@ class ArchiveService
                         }
                     }
 
-                    $search_extension = $file->getExtension();
-                    if (in_array($search_extension, $this->fileExtensions)) {
+                    $searchExtension = $file->getExtension();
+                    if (in_array($searchExtension, $this->fileExtensions)) {
                         $filePath = $file->getRealPath();
                         $fileName = substr($filePath, strlen($path) + 1);
                         $zip->addFile($filePath, $fileName);
