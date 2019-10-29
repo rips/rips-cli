@@ -224,6 +224,11 @@ class StartScanCommand extends ContainerAwareCommand
             ])->getScan();
             $output->writeln('<comment>Info:</comment> Scan "' . $scan->getVersion() . '" (' . $scan->getId() . ') finished at ' . $scan->getFinishedAt()->format(DATE_ISO8601), OutputInterface::VERBOSITY_VERBOSE);
 
+            if ($this->isScanCrashed($scan)) {
+                $output->writeln('<error>Failure:</error> The scan did not finish successfully');
+                return 1;
+            }
+
             return $this->checkScanThresholds($output, $scan, $thresholds);
         }
 
@@ -375,5 +380,15 @@ class StartScanCommand extends ContainerAwareCommand
             $progressBar->setProgress($progress);
         } while ($progress < 100 && !in_array($phase, [0, 6, 7], true));
         $progressBar->finish();
+    }
+
+    /**
+     * @param ScanEntity $scan
+     * @return bool
+     */
+    private function isScanCrashed(ScanEntity $scan)
+    {
+        $phase = $scan->getPhase();
+        return in_array($phase, [6, 7], true);
     }
 }
