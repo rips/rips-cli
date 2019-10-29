@@ -107,8 +107,8 @@ class CreateApplicationCommand extends ContainerAwareCommand
 
         $filterBuilder = new FilterBuilder();
         $condition = $filterBuilder->and(
-            $filterBuilder->greaterThan('validFrom', $now->format(DATE_ISO8601)),
-            $filterBuilder->lessThan('validUntil', $now->format(DATE_ISO8601))
+            $filterBuilder->lessThan('validFrom', $now->format(DATE_ISO8601)),
+            $filterBuilder->greaterThan('validUntil', $now->format(DATE_ISO8601))
         );
 
         /** @var QuotaService $quotaService */
@@ -116,14 +116,13 @@ class CreateApplicationCommand extends ContainerAwareCommand
 
         $quotas = $quotaService->getAll([
             'filter'  => $filterBuilder->getFilterString($condition),
-            'orderBy' => json_encode(['validUntil' => 'desc'])
+            'orderBy' => json_encode(['validUntil' => 'asc'])
         ])->getQuotas();
 
         foreach ($quotas as $quota) {
-            if ($quota->getCurrentApplication() >= $quota->getMaxApplications()) {
+            if ($quota->getMaxApplications() && $quota->getCurrentApplication() >= $quota->getMaxApplications()) {
                 continue;
             }
-
             foreach ($quota->getLanguages() as $quotaLanguage) {
                 $idMatch = $quotaLanguage->getId() === (int)$language;
                 $nameMatch = strtolower($quotaLanguage->getName()) === strtolower($language);
