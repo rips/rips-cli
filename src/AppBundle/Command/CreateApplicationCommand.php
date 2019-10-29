@@ -63,7 +63,7 @@ class CreateApplicationCommand extends ContainerAwareCommand
         $applicationInput->setName($name);
 
         $quota = (int)$input->getOption('quota');
-        $language = $input->getOption('language');
+        $language = (string)$input->getOption('language');
 
         if ($language) {
             $quota = $this->getQuotaIdByLanguage($language);
@@ -117,10 +117,9 @@ class CreateApplicationCommand extends ContainerAwareCommand
         $quotas = $quotaService->getAll([
             'filter'  => $filterBuilder->getFilterString($condition),
             'orderBy' => json_encode(['validUntil' => 'desc'])
-        ]);
+        ])->getQuotas();
 
         foreach ($quotas as $quota) {
-            /** @var QuotaEntity $quota */
             if ($quota->getCurrentApplication() >= $quota->getMaxApplications()) {
                 continue;
             }
