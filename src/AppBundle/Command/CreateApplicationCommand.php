@@ -68,7 +68,7 @@ class CreateApplicationCommand extends ContainerAwareCommand
         if ($language) {
             $quota = $this->getQuotaIdByLanguage($language);
             if (!$quota) {
-                $output->writeln('<error>Failure:</error> Could not find a valid quota for ' . $language);
+                $output->writeln('<error>Failure:</error> Could not find a valid quota for language ' . $language);
                 return 1;
             }
         }
