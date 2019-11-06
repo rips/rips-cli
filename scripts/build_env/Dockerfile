@@ -1,6 +1,7 @@
 # Pull base image.
 FROM ubuntu:18.04
 ENV DEBIAN_FRONTEND noninteractive
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Install dependencies.
 RUN \

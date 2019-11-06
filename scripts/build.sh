@@ -6,6 +6,7 @@ cd "${SCRIPT_PATH}/.."
 
 # Download dependencies
 export SYMFONY_ENV=prod
+export APP_ENV=prod
 composer install --no-interaction --no-dev --optimize-autoloader
 
 # Warm up cache

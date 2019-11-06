@@ -1,5 +1,6 @@
 FROM php:7.2-cli
 ENV DEBIAN_FRONTEND noninteractive
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN \
   apt-get update && \
