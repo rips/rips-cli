@@ -86,9 +86,7 @@ class CreateApplicationCommand extends ContainerAwareCommand
         $output->writeln('<info>Success:</info> Application "' . $application->getName() . '" (' . $application->getId() . ') was created at ' . $application->getCreatedAt()->format(DATE_ISO8601));
 
         $chargedQuota = $application->getChargedQuota();
-        if ($chargedQuota) {
-            $output->writeln('<comment>Info:</comment> Quota "' . $chargedQuota->getId() . '" was used to create application "' . $application->getName() . '" (' . $application->getId() . ')', OutputInterface::VERBOSITY_VERBOSE);
-        }
+        $output->writeln('<comment>Info:</comment> Quota "' . $chargedQuota->getId() . '" was used to create application "' . $application->getName() . '" (' . $application->getId() . ')', OutputInterface::VERBOSITY_VERBOSE);
 
         return 0;
     }

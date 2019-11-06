@@ -62,7 +62,7 @@ class Application extends BaseApplication
     {
         $versionFile = $this->kernel->getRootDir() . '/../version.txt';
         if (file_exists($versionFile)) {
-            return file_get_contents($versionFile);
+            return (string)file_get_contents($versionFile);
         } else {
             return (string)LoginCommand::MAJOR_VERSION;
         }
