@@ -11,10 +11,6 @@ RUN \
   apt-get clean && apt-get autoremove -y && \
   rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions that are not available through APT.
-RUN pecl install ast-1.0.3
-COPY configs/20-ast.ini /etc/php/7.2/cli/conf.d/20-ast.ini
-
 # Install hadolint.
 RUN \
   wget https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 -O /usr/bin/hadolint && \
