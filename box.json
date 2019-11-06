@@ -1,8 +1,8 @@
 {
   "chmod": "0755",
   "directories": [
-    "app",
     "bin",
+    "config",
     "src"
   ],
   "files": [
