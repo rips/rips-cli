@@ -11,8 +11,8 @@ RUN \
 
 # Securely install box.
 RUN \
-  wget https://github.com/box-project/box2/releases/download/2.7.5/box-2.7.5.phar -O /usr/bin/box && \
-  echo '28b4b798ad4dcf8fbf9cd68aaff495d4bbeaec4363f5f319a222829d9b6abdfe /usr/bin/box' | sha256sum --check --quiet && \
+  wget https://github.com/humbug/box/releases/download/3.8.3/box.phar -O /usr/bin/box && \
+  echo 'c3e5e8ca5e72566e36879fc6e2f77350b5cb11b93d2f9202c24ca59f9bc40623 /usr/bin/box' | sha256sum --check --quiet && \
   chmod 755 /usr/bin/box && \
   sed -i "s/;phar\.readonly = On/phar\.readonly = Off/" /etc/php/7.2/cli/php.ini
 
