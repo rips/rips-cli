@@ -14,13 +14,11 @@ RUN \
 RUN pecl install ast-0.1.6
 COPY configs/20-ast.ini /etc/php/7.2/cli/conf.d/20-ast.ini
 
-# Install NodeJS/NPM.
+# Install hadolint.
 RUN \
-  curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
-  apt-get install -y nodejs
-
-# Install docklint.
-RUN npm install -g validate-dockerfile
+  wget https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 -O /usr/bin/hadolint && \
+  echo '7224a0304415823a8f8767c99b3f769b1f57e06f4d89d18783cc23a5fe0669c5 /usr/bin/hadolint' | sha256sum --check --quiet && \
+  chmod 755 /usr/bin/hadolint
 
 # Drop privileges.
 RUN useradd -m oscar -u 999
