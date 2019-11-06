@@ -25,5 +25,6 @@
   "main": "bin/console",
   "output": "rips-cli.phar",
   "compression": "GZ",
-  "stub": true
+  "stub": true,
+  "exclude-dev-files": false
 }
