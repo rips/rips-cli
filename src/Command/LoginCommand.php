@@ -61,7 +61,7 @@ class LoginCommand extends ContainerAwareCommand
             /** @var KernelInterface $kernel */
             $kernel = $this->getContainer()->get('kernel');
             // Windows does not have ca CA bundle, so we have to hard code one.
-            $settings['verify'] = realpath($kernel->getRootDir() . '/Resources/cacert.pem');
+            $settings['verify'] = realpath($kernel->getProjectDir() . '/src/Resources/cacert.pem');
         }
 
         if ($input->getOption('config') && $credentialService->hasCredentials()) {
