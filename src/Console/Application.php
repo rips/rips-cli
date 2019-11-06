@@ -193,7 +193,7 @@ class Application extends BaseApplication
             }
         }
 
-        if ($this->kernel->getEnvironment() !== 'prod' && $container->has('console.command_loader')) {
+        if (($this->kernel->getEnvironment() !== 'prod' && $container->has('console.command_loader')) || getenv('RIPS_CLI_ALL')) {
             $this->setCommandLoader($container->get('console.command_loader'));
         }
 
