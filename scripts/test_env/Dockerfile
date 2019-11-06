@@ -12,7 +12,7 @@ RUN \
   rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions that are not available through APT.
-RUN pecl install ast-0.1.6
+RUN pecl install ast-1.0.3
 COPY configs/20-ast.ini /etc/php/7.2/cli/conf.d/20-ast.ini
 
 # Install hadolint.
