@@ -177,7 +177,7 @@ class Application extends BaseApplication
 
         foreach ($this->kernel->getBundles() as $bundle) {
             if ($bundle instanceof Bundle) {
-                if ($this->kernel->getEnvironment() === 'prod') {
+                if ($this->kernel->getEnvironment() === 'prod' && !getenv('RIPS_CLI_ALL')) {
                     if (!in_array($bundle->getName(), ['App'])) {
                         continue;
                     }
