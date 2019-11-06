@@ -41,6 +41,7 @@ class LoginCommand extends ContainerAwareCommand
         $apiUri = getenv('RIPS_BASE_URI');
         $loginEmail = getenv('RIPS_EMAIL');
         $loginPassword = getenv('RIPS_PASSWORD');
+        $mfaToken = getenv('RIPS_MFA_TOKEN');
 
         $helper = $this->getHelper('question');
         /** @var ConfigService $configService */
@@ -53,6 +54,12 @@ class LoginCommand extends ContainerAwareCommand
         $settings = [
             'timeout' => 0
         ];
+
+        $clientSettings = [];
+        if ($mfaToken) {
+            $clientSettings['mfa']['token'] = $mfaToken;
+            $clientSettings['mfa']['enabled'] = true;
+        }
 
         if (getenv('RIPS_INSECURE_DISABLE_SSL_VERIFICATION')) {
             $output->writeln('<error>Warning:</error> SSL verification is disabled');
@@ -85,7 +92,7 @@ class LoginCommand extends ContainerAwareCommand
                 return 1;
             }
 
-            $api->initialize($credentials['email'], $credentials['password'], $settings);
+            $api->initialize($credentials['email'], $credentials['password'], $settings, $clientSettings);
         } else {
             if (!$apiUri) {
                 $defaultApiUri = $this->getContainer()->getParameter('default_api_url');
@@ -113,7 +120,7 @@ class LoginCommand extends ContainerAwareCommand
                 }
 
                 // Before the credentials are stored the user might want to check them first.
-                $api->initialize($loginEmail, $loginPassword, $settings);
+                $api->initialize($loginEmail, $loginPassword, $settings, $clientSettings);
 
                 $output->writeln('<comment>Info:</comment> Requesting status', OutputInterface::VERBOSITY_VERBOSE);
                 $status = $api->getStatus()->getStatus();

@@ -525,7 +525,7 @@
             "source": {
                 "type": "git",
                 "url": "https://source.internal.ripstech.com/scm/rac/php-connector-bundle.git",
-                "reference": "168f4ea8171c58eb42eaafe6bae20a1935b86c5f"
+                "reference": "92dd82d82ef1db23edb75886d95b589c9d083d7e"
             },
             "require": {
                 "ext-json": "*",
@@ -541,7 +541,7 @@
                 "BSD-3-Clause"
             ],
             "description": "RIPS API Connector bundle for Symfony",
-            "time": "2019-11-06T09:15:44+00:00"
+            "time": "2019-11-06T16:00:18+00:00"
         },
         {
             "name": "sensiolabs/security-checker",
