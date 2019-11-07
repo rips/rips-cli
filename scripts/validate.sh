@@ -9,6 +9,8 @@ hadolint --ignore DL3008 --ignore DL3015 scripts/build_env/Dockerfile
 hadolint --ignore DL3008 --ignore DL3015 scripts/test_env/Dockerfile
 
 export SYMFONY_ENV=test
+export APP_ENV=test
+export RIPS_CLI_ALL=1
 composer install --dev --no-interaction
 
 ./bin/console security:check

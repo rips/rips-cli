@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5c108346c1ca0fbc65f784a1a94471fb",
+    "content-hash": "c27cfbe7fd566b1402aef180493e9cee",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -484,17 +484,11 @@
         },
         {
             "name": "rips/connector",
-            "version": "3.2.1",
+            "version": "dev-dev",
             "source": {
                 "type": "git",
-                "url": "https://github.com/rips/php-connector.git",
-                "reference": "720b15dfbd60d327c8669ecc16c7c67353f1a03c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/rips/php-connector/zipball/720b15dfbd60d327c8669ecc16c7c67353f1a03c",
-                "reference": "720b15dfbd60d327c8669ecc16c7c67353f1a03c",
-                "shasum": ""
+                "url": "https://source.internal.ripstech.com/scm/rac/php-connector.git",
+                "reference": "ddfaa9e5e5e19fc5856d5fab63f2274af73d1f2f"
             },
             "require": {
                 "ext-json": "*",
@@ -511,30 +505,31 @@
                     "RIPS\\Connector\\": "src"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "classmap": [
+                    "test/TestCase.php"
+                ],
+                "psr-4": {
+                    "RIPS\\Test\\": "test"
+                }
+            },
             "license": [
                 "BSD-3-Clause"
             ],
             "description": "RIPS API connector package",
-            "time": "2019-08-19T13:56:01+00:00"
+            "time": "2019-11-05T14:45:34+00:00"
         },
         {
             "name": "rips/connector-bundle",
-            "version": "3.2.1",
+            "version": "dev-dev",
             "source": {
                 "type": "git",
-                "url": "https://github.com/rips/php-connector-bundle.git",
-                "reference": "3caf099e8dfaa6e4d7d77fd0b7dfbdaf1022d06a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/rips/php-connector-bundle/zipball/3caf099e8dfaa6e4d7d77fd0b7dfbdaf1022d06a",
-                "reference": "3caf099e8dfaa6e4d7d77fd0b7dfbdaf1022d06a",
-                "shasum": ""
+                "url": "https://source.internal.ripstech.com/scm/rac/php-connector-bundle.git",
+                "reference": "92dd82d82ef1db23edb75886d95b589c9d083d7e"
             },
             "require": {
                 "ext-json": "*",
-                "rips/connector": "^3.2"
+                "rips/connector": "dev-dev"
             },
             "type": "symfony-bundle",
             "autoload": {
@@ -542,12 +537,11 @@
                     "RIPS\\ConnectorBundle\\": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
             "description": "RIPS API Connector bundle for Symfony",
-            "time": "2019-08-19T14:00:59+00:00"
+            "time": "2019-11-06T16:00:18+00:00"
         },
         {
             "name": "sensiolabs/security-checker",
@@ -3161,7 +3155,10 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "rips/connector": 20,
+        "rips/connector-bundle": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
