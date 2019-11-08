@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c27cfbe7fd566b1402aef180493e9cee",
+    "content-hash": "70ec1337d5a8be15c0171b43b9eeb4f4",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -484,11 +484,17 @@
         },
         {
             "name": "rips/connector",
-            "version": "dev-dev",
+            "version": "3.3.0",
             "source": {
                 "type": "git",
-                "url": "https://source.internal.ripstech.com/scm/rac/php-connector.git",
-                "reference": "ddfaa9e5e5e19fc5856d5fab63f2274af73d1f2f"
+                "url": "https://github.com/rips/php-connector.git",
+                "reference": "ab2d80893bf7ad50edd88b6da9d682949a8d0902"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rips/php-connector/zipball/ab2d80893bf7ad50edd88b6da9d682949a8d0902",
+                "reference": "ab2d80893bf7ad50edd88b6da9d682949a8d0902",
+                "shasum": ""
             },
             "require": {
                 "ext-json": "*",
@@ -505,31 +511,30 @@
                     "RIPS\\Connector\\": "src"
                 }
             },
-            "autoload-dev": {
-                "classmap": [
-                    "test/TestCase.php"
-                ],
-                "psr-4": {
-                    "RIPS\\Test\\": "test"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
             "description": "RIPS API connector package",
-            "time": "2019-11-05T14:45:34+00:00"
+            "time": "2019-11-08T15:07:10+00:00"
         },
         {
             "name": "rips/connector-bundle",
-            "version": "dev-dev",
+            "version": "3.3.0",
             "source": {
                 "type": "git",
-                "url": "https://source.internal.ripstech.com/scm/rac/php-connector-bundle.git",
-                "reference": "92dd82d82ef1db23edb75886d95b589c9d083d7e"
+                "url": "https://github.com/rips/php-connector-bundle.git",
+                "reference": "36a7edb381431bb4092abd08af531f472756413b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rips/php-connector-bundle/zipball/36a7edb381431bb4092abd08af531f472756413b",
+                "reference": "36a7edb381431bb4092abd08af531f472756413b",
+                "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "rips/connector": "dev-dev"
+                "rips/connector": "~3.3"
             },
             "type": "symfony-bundle",
             "autoload": {
@@ -537,11 +542,12 @@
                     "RIPS\\ConnectorBundle\\": ""
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
             "description": "RIPS API Connector bundle for Symfony",
-            "time": "2019-11-06T16:00:18+00:00"
+            "time": "2019-11-08T15:16:01+00:00"
         },
         {
             "name": "sensiolabs/security-checker",
@@ -2195,24 +2201,24 @@
     "packages-dev": [
         {
             "name": "composer/xdebug-handler",
-            "version": "1.3.3",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/xdebug-handler.git",
-                "reference": "46867cbf8ca9fb8d60c506895449eb799db1184f"
+                "reference": "cbe23383749496fe0f373345208b79568e4bc248"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/xdebug-handler/zipball/46867cbf8ca9fb8d60c506895449eb799db1184f",
-                "reference": "46867cbf8ca9fb8d60c506895449eb799db1184f",
+                "url": "https://api.github.com/repos/composer/xdebug-handler/zipball/cbe23383749496fe0f373345208b79568e4bc248",
+                "reference": "cbe23383749496fe0f373345208b79568e4bc248",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.3.2 || ^7.0",
+                "php": "^5.3.2 || ^7.0 || ^8.0",
                 "psr/log": "^1.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.5"
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || 6.5 - 8"
             },
             "type": "library",
             "autoload": {
@@ -2230,12 +2236,12 @@
                     "email": "john-stevenson@blueyonder.co.uk"
                 }
             ],
-            "description": "Restarts a process without xdebug.",
+            "description": "Restarts a process without Xdebug.",
             "keywords": [
                 "Xdebug",
                 "performance"
             ],
-            "time": "2019-05-27T17:52:04+00:00"
+            "time": "2019-11-06T16:40:04+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -2817,16 +2823,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v4.2.5",
+            "version": "v4.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "b76bbc3c51f22c570648de48e8c2d941ed5e2cf2"
+                "reference": "9a9981c347c5c49d6dfe5cf826bb882b824080dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/b76bbc3c51f22c570648de48e8c2d941ed5e2cf2",
-                "reference": "b76bbc3c51f22c570648de48e8c2d941ed5e2cf2",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/9a9981c347c5c49d6dfe5cf826bb882b824080dc",
+                "reference": "9a9981c347c5c49d6dfe5cf826bb882b824080dc",
                 "shasum": ""
             },
             "require": {
@@ -2834,7 +2840,7 @@
                 "php": ">=7.0"
             },
             "require-dev": {
-                "ircmaxell/php-yacc": "0.0.4",
+                "ircmaxell/php-yacc": "0.0.5",
                 "phpunit/phpunit": "^6.5 || ^7.0 || ^8.0"
             },
             "bin": [
@@ -2843,7 +2849,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "4.2-dev"
+                    "dev-master": "4.3-dev"
                 }
             },
             "autoload": {
@@ -2865,7 +2871,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2019-10-25T18:33:07+00:00"
+            "time": "2019-11-08T13:50:10+00:00"
         },
         {
             "name": "ocramius/package-versions",
@@ -3155,10 +3161,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "rips/connector": 20,
-        "rips/connector-bundle": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
