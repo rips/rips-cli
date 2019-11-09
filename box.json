@@ -1,14 +1,15 @@
 {
   "chmod": "0755",
   "directories": [
-    "app",
     "bin",
+    "config",
     "src"
   ],
   "files": [
     "composer.json",
     "composer.lock",
-    "version.txt"
+    "version.txt",
+    ".env"
   ],
   "finder": [
     {
@@ -25,5 +26,6 @@
   "main": "bin/console",
   "output": "rips-cli.phar",
   "compression": "GZ",
-  "stub": true
+  "stub": true,
+  "exclude-dev-files": false
 }
