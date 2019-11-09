@@ -7,7 +7,7 @@ A command line interface for RIPS v3.
 
 # Requirements
 To use `rips-cli` you need `php-cli` as well as the `php-zip` extension.
-It is recommended to use the [PHAR build](https://kb.ripstech.com/display/DOC/RIPS+CLI#RIPSCLI-PHAR) of `rips-cli`. If you do not plan to use the PHAR you have to download the dependencies with Composer first. Also, you have to execute `bin/console` instead of `rips-cli`.
+It is recommended to use the [PHAR build](https://kb.ripstech.com/doc/latest/tooling/rips-cli) of `rips-cli`. If you do not plan to use the PHAR you have to download the dependencies with Composer first. Also, you have to execute `bin/console` instead of `rips-cli`.
 
  * composer install
  * php bin/console
@@ -19,13 +19,14 @@ It is recommended to use the [PHAR build](https://kb.ripstech.com/display/DOC/RI
 ## Environment
 You can also use environment variables to set certain properties.
 
-| Name          | Description                    |
-|---------------|--------------------------------|
-| RIPS_BASE_URI | Set API address                |
-| RIPS_EMAIL    | Set API e-mail                 |
-| RIPS_PASSWORD | Set API password               |
-| RIPS_CONFIG   | Set path to configuration file |
+| Name           | Description                    |
+|----------------|--------------------------------|
+| RIPS_BASE_URI  | Set API address                |
+| RIPS_EMAIL     | Set API e-mail                 |
+| RIPS_PASSWORD  | Set API password               |
+| RIPS_MFA_TOKEN | Set API MFA token              |
+| RIPS_CONFIG    | Set path to configuration file |
 
 ## Help
 Call `rips-cli` without any parameters to see a list of all commands. Use `--help` or `-h` in combination with a command to see all available parameters.
-For more details please refer to the [documentation](https://kb.ripstech.com/display/DOC/RIPS+CLI).
+For more details please refer to the [documentation](https://kb.ripstech.com/doc/latest/tooling/rips-cli).
