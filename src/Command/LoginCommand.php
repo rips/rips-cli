@@ -4,20 +4,55 @@ namespace App\Command;
 
 use App\Service\ConfigService;
 use App\Service\CredentialService;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use RIPS\Connector\Exceptions\ClientException;
 use RIPS\ConnectorBundle\Services\APIService;
 use RIPS\ConnectorBundle\Entities\StatusEntity;
 
-class LoginCommand extends ContainerAwareCommand
+class LoginCommand extends Command
 {
     const MAJOR_VERSION = 3;
+
+    /** @var ContainerInterface */
+    private $container;
+
+    /** @var ConfigService */
+    private $configService;
+
+    /** @var CredentialService */
+    private $credentialService;
+
+    /** @var APIService */
+    private $api;
+
+    /**
+     * LoginCommand constructor.
+     * @param ContainerInterface $container
+     * @param ConfigService $configService
+     * @param CredentialService $credentialService
+     * @param APIService $api
+     */
+    public function __construct(
+        ContainerInterface $container,
+        ConfigService $configService,
+        CredentialService $credentialService,
+        APIService $api
+    )
+    {
+        $this->container = $container;
+        $this->configService = $configService;
+        $this->credentialService = $credentialService;
+        $this->api = $api;
+
+        parent::__construct();
+    }
 
     public function configure()
     {
@@ -44,12 +79,6 @@ class LoginCommand extends ContainerAwareCommand
         $mfaToken = getenv('RIPS_MFA_TOKEN');
 
         $helper = $this->getHelper('question');
-        /** @var ConfigService $configService */
-        $configService = $this->getContainer()->get(ConfigService::class);
-        /** @var CredentialService $credentialService */
-        $credentialService = $this->getContainer()->get(CredentialService::class);
-        /** @var APIService $api */
-        $api = $this->getContainer()->get(APIService::class);
 
         $settings = [
             'timeout' => 0
@@ -66,13 +95,13 @@ class LoginCommand extends ContainerAwareCommand
             $settings['verify'] = false;
         } else if (stristr(PHP_OS, 'WIN')) {
             /** @var KernelInterface $kernel */
-            $kernel = $this->getContainer()->get('kernel');
+            $kernel = $this->container->get('kernel');
             // Windows does not have ca CA bundle, so we have to hard code one.
             $settings['verify'] = realpath($kernel->getProjectDir() . '/src/Resources/cacert.pem');
         }
 
-        if ($input->getOption('config') && $credentialService->hasCredentials()) {
-            $credentials = $credentialService->getCredentials();
+        if ($input->getOption('config') && $this->credentialService->hasCredentials()) {
+            $credentials = $this->credentialService->getCredentials();
 
             if ($apiUri) {
                 $credentials['base_uri'] = $apiUri;
@@ -92,10 +121,10 @@ class LoginCommand extends ContainerAwareCommand
                 return 1;
             }
 
-            $api->initialize($credentials['email'], $credentials['password'], $settings, $clientSettings);
+            $this->api->initialize($credentials['email'], $credentials['password'], $settings, $clientSettings);
         } else {
             if (!$apiUri) {
-                $defaultApiUri = $this->getContainer()->getParameter('default_api_url');
+                $defaultApiUri = $this->container->getParameter('default_api_url');
                 $loginUriQuestion = new Question('Please enter RIPS-API URL (default: ' . $defaultApiUri . '): ', $defaultApiUri);
                 $apiUri = $helper->ask($input, $output, $loginUriQuestion);
             }
@@ -120,10 +149,10 @@ class LoginCommand extends ContainerAwareCommand
                 }
 
                 // Before the credentials are stored the user might want to check them first.
-                $api->initialize($loginEmail, $loginPassword, $settings, $clientSettings);
+                $this->api->initialize($loginEmail, $loginPassword, $settings, $clientSettings);
 
                 $output->writeln('<comment>Info:</comment> Requesting status', OutputInterface::VERBOSITY_VERBOSE);
-                $status = $api->getStatus()->getStatus();
+                $status = $this->api->getStatus()->getStatus();
 
                 if (!$this->validMajorVersion($status)) {
                     $output->writeln('<error>Failure:</error> API version not compatible with client');
@@ -160,12 +189,12 @@ class LoginCommand extends ContainerAwareCommand
                 if ($input->getOption('force')) {
                     $storeConfirmation = true;
                 } else {
-                    $storeQuestion = new ConfirmationQuestion('Do you really want to store the credentials in ' . $configService->getFile() . '? (y/n) ', false);
+                    $storeQuestion = new ConfirmationQuestion('Do you really want to store the credentials in ' . $this->configService->getFile() . '? (y/n) ', false);
                     $storeConfirmation = $helper->ask($input, $output, $storeQuestion);
                 }
                 if ($storeConfirmation) {
-                    $output->writeln('<comment>Info:</comment> Trying to store credentials in ' . $configService->getFile(), OutputInterface::VERBOSITY_VERBOSE);
-                    $credentialService->storeCredentials($loginEmail, $loginPassword, $apiUri);
+                    $output->writeln('<comment>Info:</comment> Trying to store credentials in ' . $this->configService->getFile(), OutputInterface::VERBOSITY_VERBOSE);
+                    $this->credentialService->storeCredentials($loginEmail, $loginPassword, $apiUri);
                     $output->writeln('<info>Success:</info> Credentials have been stored successfully');
                 }
             }

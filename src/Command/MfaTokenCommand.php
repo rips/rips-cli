@@ -3,21 +3,31 @@
 namespace App\Command;
 
 use RIPS\Connector\Exceptions\ClientException;
-use RIPS\ConnectorBundle\InputBuilders\FilterBuilder;
 use RIPS\ConnectorBundle\InputBuilders\User\Mfa\ChallengeBuilder;
-use RIPS\ConnectorBundle\Services\ApplicationService;
 use RIPS\ConnectorBundle\Services\MfaService;
-use RIPS\ConnectorBundle\Services\QuotaService;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use RIPS\ConnectorBundle\InputBuilders\ApplicationBuilder;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Question\Question;
 
-class MfaTokenCommand extends ContainerAwareCommand
+class MfaTokenCommand extends Command
 {
+    /** @var MfaService */
+    private $mfaService;
+
+    /**
+     * MfaTokenCommand constructor.
+     * @param MfaService $mfaService
+     */
+    public function __construct(MfaService $mfaService)
+    {
+        $this->mfaService = $mfaService;
+
+        parent::__construct();
+    }
+
     public function configure()
     {
         $this
@@ -42,17 +52,14 @@ class MfaTokenCommand extends ContainerAwareCommand
 
         $helper = $this->getHelper('question');
 
-        /** @var MfaService $mfaService */
-        $mfaService = $this->getContainer()->get(MfaService::class);
-
         try {
-            $mfaIntialized = false;
-            $mfaService->getSecret()->getMfa();
+            $mfaInitialized = false;
+            $this->mfaService->getSecret()->getMfa();
         } catch (ClientException $exception) {
-            $mfaIntialized = true;
+            $mfaInitialized = true;
         }
 
-        if (!$mfaIntialized) {
+        if (!$mfaInitialized) {
             $output->writeln('<error>Failure:</error> MFA not initialized yet');
             return 1;
         }
@@ -73,7 +80,7 @@ class MfaTokenCommand extends ContainerAwareCommand
         $challengeInput->setCode($code);
 
         try {
-            $mfa = $mfaService->getToken($challengeInput)->getMfa();
+            $mfa = $this->mfaService->getToken($challengeInput)->getMfa();
         } catch (ClientException $exception) {
             $error = rtrim(strtolower($exception->getMessage()), '.');
             $output->writeln('<error>Failure:</error> Code not accepted (' . $error . ')');

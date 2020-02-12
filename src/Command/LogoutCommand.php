@@ -3,14 +3,30 @@
 namespace App\Command;
 
 use App\Service\CredentialService;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
-class LogoutCommand extends ContainerAwareCommand
+class LogoutCommand extends Command
 {
+    /** @var CredentialService */
+    private $credentialService;
+
+    /**
+     * LogoutCommand constructor.
+     * @param CredentialService $credentialService
+     */
+    public function __construct(
+        CredentialService $credentialService
+    )
+    {
+        $this->credentialService = $credentialService;
+
+        parent::__construct();
+    }
+
     public function configure()
     {
         $this
@@ -38,9 +54,7 @@ class LogoutCommand extends ContainerAwareCommand
         }
 
         $output->writeln('<comment>Info:</comment> Trying to remove credentials', OutputInterface::VERBOSITY_VERBOSE);
-        /** @var CredentialService $credentialService */
-        $credentialService = $this->getContainer()->get(CredentialService::class);
-        $credentialService->removeCredentials();
+        $this->credentialService->removeCredentials();
         $output->writeln('<info>Success:</info> Logout successful');
 
         return 0;

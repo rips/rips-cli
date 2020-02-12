@@ -3,7 +3,7 @@
 namespace App\Command;
 
 use App\Service\TableColumnService;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -11,9 +11,32 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ListSetupCommand extends ContainerAwareCommand
+class ListSetupCommand extends Command
 {
+    /** @var ContainerInterface */
+    private $container;
+
+    /** @var TableColumnService */
+    private $tableService;
+
+    /**
+     * ListSetupCommand constructor.
+     * @param ContainerInterface $container
+     * @param TableColumnService $tableService
+     */
+    public function __construct(
+        ContainerInterface $container,
+        TableColumnService $tableService
+    )
+    {
+        $this->container = $container;
+        $this->tableService = $tableService;
+
+        parent::__construct();
+    }
+
     public function configure()
     {
         $this
@@ -33,7 +56,7 @@ class ListSetupCommand extends ContainerAwareCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $helper = $this->getHelper('question');
-        $allTables = $this->getContainer()->getParameter('tables');
+        $allTables = $this->container->getParameter('tables');
         $availableTables = [];
 
         foreach ($allTables as $tableName => $tableDetails) {
@@ -53,17 +76,14 @@ class ListSetupCommand extends ContainerAwareCommand
             return 1;
         }
 
-        /** @var TableColumnService $tableColumnService */
-        $tableColumnService = $this->getContainer()->get(TableColumnService::class);
-
         // First check if the user just wants to restore the defaults.
         if ($input->getOption('remove')) {
-            $tableColumnService->removeColumns($table);
+            $this->tableService->removeColumns($table);
             $output->writeln('<info>Success:</info> Removed table "' . $table . '" from config');
             return 0;
         }
 
-        $columnDetails = $tableColumnService->getColumnDetails($table);
+        $columnDetails = $this->tableService->getColumnDetails($table);
 
         // Print the available columns.
         $columnTable = new Table($output);
@@ -96,7 +116,7 @@ class ListSetupCommand extends ContainerAwareCommand
         $userColumns = array_unique($userColumns);
 
         // Store columns in config.
-        $tableColumnService->storeColumns($table, $userColumns);
+        $this->tableService->storeColumns($table, $userColumns);
 
         return 0;
     }

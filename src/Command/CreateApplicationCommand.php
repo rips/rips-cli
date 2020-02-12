@@ -5,16 +5,30 @@ namespace App\Command;
 use RIPS\ConnectorBundle\InputBuilders\FilterBuilder;
 use RIPS\ConnectorBundle\Services\ApplicationService;
 use RIPS\ConnectorBundle\Services\QuotaService;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use RIPS\ConnectorBundle\InputBuilders\ApplicationBuilder;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Question\Question;
 
-class CreateApplicationCommand extends ContainerAwareCommand
+class CreateApplicationCommand extends Command
 {
+    /** @var ApplicationService */
+    private $applicationService;
+
+    /**
+     * CreateApplicationCommand constructor.
+     * @param ApplicationService $applicationService
+     */
+    public function __construct(ApplicationService $applicationService)
+    {
+        $this->applicationService = $applicationService;
+
+        parent::__construct();
+    }
+
     public function configure()
     {
         $this
@@ -79,9 +93,7 @@ class CreateApplicationCommand extends ContainerAwareCommand
 
         $output->writeln('<comment>Info:</comment> Trying to create application "' . $name . '"', OutputInterface::VERBOSITY_VERBOSE);
 
-        /** @var ApplicationService $applicationService */
-        $applicationService = $this->getContainer()->get(ApplicationService::class);
-        $application = $applicationService->create($applicationInput)->getApplication();
+        $application = $this->applicationService->create($applicationInput)->getApplication();
 
         $output->writeln('<info>Success:</info> Application "' . $application->getName() . '" (' . $application->getId() . ') was created at ' . $application->getCreatedAt()->format(DATE_ISO8601));
 

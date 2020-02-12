@@ -5,7 +5,7 @@ namespace App\Command;
 use App\Service\PrettyOutputService;
 use App\Service\RequestService;
 use App\Service\TableColumnService;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,10 +14,45 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ListCommand extends ContainerAwareCommand
+class ListCommand extends Command
 {
     const TABLES_PARAMETER = 'tables';
+
+    /** @var ContainerInterface */
+    private $container;
+
+    /** @var TableColumnService */
+    private $tableService;
+
+    /** @var RequestService */
+    private $requestService;
+
+    /** @var PrettyOutputService */
+    private $prettyOutputService;
+
+    /**
+     * DeleteCommand constructor.
+     * @param ContainerInterface $container
+     * @param TableColumnService $tableService
+     * @param RequestService $requestService
+     * @param PrettyOutputService $prettyOutputService
+     */
+    public function __construct(
+        ContainerInterface $container,
+        TableColumnService $tableService,
+        RequestService $requestService,
+        PrettyOutputService $prettyOutputService
+    )
+    {
+        $this->container = $container;
+        $this->tableService = $tableService;
+        $this->requestService = $requestService;
+        $this->prettyOutputService = $prettyOutputService;
+
+        parent::__construct();
+    }
 
     public function configure()
     {
@@ -51,13 +86,10 @@ class ListCommand extends ContainerAwareCommand
             $input->setOption('table', $helper->ask($input, $output, $tableQuestion));
         }
 
-        /** @var TableColumnService $tableColumnService */
-        $tableColumnService = $this->getContainer()->get(TableColumnService::class);
-
         $table = (string)$input->getOption('table');
-        $availableColumns = $tableColumnService->getColumns($table);
-        $columnDetails = $tableColumnService->getColumnDetails($table);
-        $serviceDetails = $tableColumnService->getServiceDetails($table);
+        $availableColumns = $this->tableService->getColumns($table);
+        $columnDetails = $this->tableService->getColumnDetails($table);
+        $serviceDetails = $this->tableService->getServiceDetails($table);
 
         if (!isset($serviceDetails['list'])) {
             $output->writeln('<error>Failure:</error> This table does not support the list operation');
@@ -92,17 +124,13 @@ class ListCommand extends ContainerAwareCommand
             }
         }
 
-        /** @var RequestService $requestService */
-        $requestService = $this->getContainer()->get(RequestService::class);
-        $queryParams = $requestService->transformParametersForQuery((array)$input->getOption('parameter'));
+        $queryParams = $this->requestService->transformParametersForQuery((array)$input->getOption('parameter'));
         $filteredArguments[] = $queryParams;
 
-        $service = $this->getContainer()->get($serviceDetails['name']);
+        $service = $this->container->get($serviceDetails['name']);
         $response = call_user_func_array([$service, $serviceDetails['list']['methods'][0]], $filteredArguments);
         $elements = call_user_func([$response, $serviceDetails['list']['methods'][1]]);
 
-        /** @var PrettyOutputService $prettyOutputService */
-        $prettyOutputService = $this->getContainer()->get(PrettyOutputService::class);
         $maxChars = (int)$input->getOption('max-chars');
 
         // Build the output table row by row.
@@ -126,8 +154,8 @@ class ListCommand extends ContainerAwareCommand
                         $currentValue = call_user_func([$currentValue, $method]);
                     }
 
-                    $row[$key] = $prettyOutputService->toString($currentValue);
-                    $row[$key] = $prettyOutputService->shortenString($row[$key], $maxChars);
+                    $row[$key] = $this->prettyOutputService->toString($currentValue);
+                    $row[$key] = $this->prettyOutputService->shortenString($row[$key], $maxChars);
                 }
             }
 
@@ -144,7 +172,7 @@ class ListCommand extends ContainerAwareCommand
      */
     private function getTables()
     {
-        return $this->getContainer()->getParameter(self::TABLES_PARAMETER);
+        return $this->container->getParameter(self::TABLES_PARAMETER);
     }
 
     /**
