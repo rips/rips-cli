@@ -18,13 +18,18 @@ class CreateApplicationCommand extends Command
     /** @var ApplicationService */
     private $applicationService;
 
+    /** @var QuotaService */
+    private $quotaService;
+
     /**
      * CreateApplicationCommand constructor.
      * @param ApplicationService $applicationService
+     * @param QuotaService $quotaService
      */
-    public function __construct(ApplicationService $applicationService)
+    public function __construct(ApplicationService $applicationService, QuotaService $quotaService)
     {
         $this->applicationService = $applicationService;
+        $this->quotaService = $quotaService;
 
         parent::__construct();
     }
@@ -120,10 +125,7 @@ class CreateApplicationCommand extends Command
             $filterBuilder->greaterThan('validUntil', $now->format(DATE_ISO8601))
         );
 
-        /** @var QuotaService $quotaService */
-        $quotaService = $this->getContainer()->get(QuotaService::class);
-
-        $quotas = $quotaService->getAll([
+        $quotas = $this->quotaService->getAll([
             'filter'  => $filterBuilder->getFilterString($condition),
             'orderBy' => json_encode(['validUntil' => 'asc'])
         ])->getQuotas();
