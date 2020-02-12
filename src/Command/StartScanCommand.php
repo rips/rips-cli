@@ -4,7 +4,7 @@ namespace App\Command;
 
 use App\Service\ArchiveService;
 use App\Service\EnvService;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Filesystem\Filesystem;
 use RIPS\ConnectorBundle\Entities\Application\ScanEntity;
@@ -23,8 +23,53 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Question\Question;
 
-class StartScanCommand extends ContainerAwareCommand
+class StartScanCommand extends Command
 {
+    /** @var EnvService */
+    private $envService;
+
+    /** @var ScanService */
+    private $scanService;
+
+    /** @var ApplicationService */
+    private $applicationService;
+
+    /** @var LanguageService */
+    private $languageService;
+
+    /** @var ArchiveService */
+    private $archiveService;
+
+    /** @var UploadService */
+    private $uploadService;
+
+    /**
+     * StartScanCommand constructor.
+     * @param EnvService $envService
+     * @param ScanService $scanService
+     * @param ApplicationService $applicationService
+     * @param LanguageService $languageService
+     * @param ArchiveService $archiveService
+     * @param UploadService $uploadService
+     */
+    public function __construct(
+        EnvService $envService,
+        ScanService $scanService,
+        ApplicationService $applicationService,
+        LanguageService $languageService,
+        ArchiveService $archiveService,
+        UploadService $uploadService
+    ) {
+        $this->envService = $envService;
+        $this->scanService = $scanService;
+        $this->applicationService = $applicationService;
+        $this->languageService = $languageService;
+        $this->archiveService = $archiveService;
+        $this->uploadService = $uploadService;
+
+        parent::__construct();
+    }
+
     public function configure()
     {
         $this
@@ -170,20 +215,17 @@ class StartScanCommand extends ContainerAwareCommand
         if ($envFile) {
             $output->writeln('<comment>Info:</comment> Using env from ' . $envFile, OutputInterface::VERBOSITY_VERBOSE);
             try {
-                /** @var EnvService $envService */
-                $envService = $this->getContainer()->get(EnvService::class);
-
                 $languageEnvs = [
                     'php' => PhpBuilder::class,
                     'java' => JavaBuilder::class
                 ];
 
                 foreach ($languageEnvs as $languageEnvKey => $languageEnvClass) {
-                    if (!$envService->hasEnv($languageEnvKey, $envFile)) {
+                    if (!$this->envService->hasEnv($languageEnvKey, $envFile)) {
                         continue;
                     }
                     $arrayInput[$languageEnvKey] = new $languageEnvClass(
-                        $envService->loadEnvFromFile($languageEnvKey, $envFile)
+                        $this->envService->loadEnvFromFile($languageEnvKey, $envFile)
                     );
                 }
             } catch (\Exception $e) {
@@ -199,22 +241,19 @@ class StartScanCommand extends ContainerAwareCommand
             $arrayInput['tags'] = new TagBuilder($tags);
         }
 
-        /** @var ScanService $scanService */
-        $scanService = $this->getContainer()->get(ScanService::class);
-
         $output->writeln('<comment>Info:</comment> Trying to start scan', OutputInterface::VERBOSITY_VERBOSE);
-        $scan = $scanService->create($applicationId, $arrayInput)->getScan();
+        $scan = $this->scanService->create($applicationId, $arrayInput)->getScan();
         $output->writeln('<info>Success:</info> Scan "' . $scan->getVersion() . '" (' . $scan->getId() . ') was successfully started at ' . $scan->getStartedAt()->format(DATE_ISO8601));
 
         if ($input->getOption('progress')) {
-            $this->blockAndShowProgress($output, $scanService, $applicationId, $scan);
+            $this->blockAndShowProgress($output, (int)$applicationId, $scan);
         }
 
         // Wait for scan to finish if user wants an exit code based on the results.
         $thresholds = (array)$input->getOption('threshold');
         if ($thresholds) {
             $output->writeln('<comment>Info:</comment> Waiting for scan "' . $scan->getVersion() . '" (' . $scan->getId() . ') to finish', OutputInterface::VERBOSITY_VERBOSE);
-            $scan = $scanService->blockUntilDone($applicationId, $scan->getId(), 0, 5, [
+            $scan = $this->scanService->blockUntilDone($applicationId, $scan->getId(), 0, 5, [
                 'customFilter' => json_encode([
                     'severityDistribution' => [
                         'show' => true,
@@ -241,16 +280,11 @@ class StartScanCommand extends ContainerAwareCommand
      */
     private function getFileExtensions($applicationId)
     {
-        /** @var ApplicationService $applicationService */
-        $applicationService = $this->getContainer()->get(ApplicationService::class);
-        $application = $applicationService->getById($applicationId)->getApplication();
-
-        /** @var LanguageService $languageService */
-        $languageService = $this->getContainer()->get(LanguageService::class);
+        $application = $this->applicationService->getById($applicationId)->getApplication();
 
         $fileExtensions = [];
         foreach ($application->getChargedQuota()->getLanguages() as $language) {
-            $language = $languageService->getById($language->getId())->getLanguage();
+            $language = $this->languageService->getById($language->getId())->getLanguage();
             $fileExtensions = array_unique(array_merge($fileExtensions, $language->getFileExtensions()));
         }
         return $fileExtensions;
@@ -265,17 +299,14 @@ class StartScanCommand extends ContainerAwareCommand
      */
     private function uploadPath($applicationId, $path, $excludePath = [])
     {
-        /** @var ArchiveService $archiveService */
-        $archiveService = $this->getContainer()->get(ArchiveService::class);
-
         // Use file extensions from API if it provides them. Otherwise fall back to the internal ones (RCLI-61).
         $fileExtensions = $this->getFileExtensions($applicationId);
         if (!empty($fileExtensions)) {
-            $archiveService->setFileExtensions($fileExtensions);
+            $this->archiveService->setFileExtensions($fileExtensions);
         }
 
-        if (!$archiveService->isArchive($path)) {
-            $archivePath = $archiveService->folderToArchive($path, $excludePath);
+        if (!$this->archiveService->isArchive($path)) {
+            $archivePath = $this->archiveService->folderToArchive($path, $excludePath);
             $archiveName = basename($archivePath) . '.zip';
             $removeZip = true;
         } else {
@@ -283,17 +314,14 @@ class StartScanCommand extends ContainerAwareCommand
             $archivePath = $path;
             $removeZip = false;
              // If it is a .zip, upload a cleaned version.
-            if ($archiveService->isZipArchive($archivePath)) {
-                $archivePath = $archiveService->archiveToArchive($archivePath, $excludePath);
+            if ($this->archiveService->isZipArchive($archivePath)) {
+                $archivePath = $this->archiveService->archiveToArchive($archivePath, $excludePath);
                 $removeZip = true;
             }
         }
 
-        /** @var UploadService $uploadService */
-        $uploadService = $this->getContainer()->get(UploadService::class);
-
         try {
-            return $uploadService->create($applicationId, $archiveName, $archivePath)->getUpload();
+            return $this->uploadService->create($applicationId, $archiveName, $archivePath)->getUpload();
         } catch (\Exception $e) {
             return null;
         } finally {
@@ -360,11 +388,10 @@ class StartScanCommand extends ContainerAwareCommand
 
     /**
      * @param OutputInterface $output
-     * @param ScanService $scanService
      * @param int $applicationId
      * @param ScanEntity $scan
      */
-    private function blockAndShowProgress(OutputInterface $output, ScanService $scanService, $applicationId, ScanEntity $scan)
+    private function blockAndShowProgress(OutputInterface $output, int $applicationId, ScanEntity $scan)
     {
         $progressBar = new ProgressBar($output, 100);
         $progressBar->setFormat("Progress: [%bar%] %percent%%");
@@ -374,7 +401,7 @@ class StartScanCommand extends ContainerAwareCommand
         // Loop and update progress until we hit 100% or the scan's phase is an exit phase.
         do {
             sleep(5);
-            $scan = $scanService->getById($applicationId, $scan->getId())->getScan();
+            $scan = $this->scanService->getById($applicationId, $scan->getId())->getScan();
             $progress = $scan->getPercent();
             $phase = $scan->getPhase();
             $progressBar->setProgress($progress);

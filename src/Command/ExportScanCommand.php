@@ -4,17 +4,45 @@ namespace App\Command;
 
 use App\Service\RequestService;
 use RIPS\ConnectorBundle\Services\Application\Scan\ExportService;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ExportScanCommand extends ContainerAwareCommand
+class ExportScanCommand extends Command
 {
     const EXPORT_TYPES_PARAMETER = 'export_types';
+
+    /** @var ContainerInterface */
+    private $container;
+
+    /** @var RequestService */
+    private $requestService;
+
+    /** @var ExportService */
+    private $exportService;
+
+    /**
+     * ExportScanCommand constructor.
+     * @param ContainerInterface $container
+     * @param RequestService $requestService
+     * @param ExportService $exportService
+     */
+    public function __construct(
+        ContainerInterface $container,
+        RequestService $requestService,
+        ExportService $exportService
+    ) {
+        $this->container = $container;
+        $this->requestService = $requestService;
+        $this->exportService = $exportService;
+
+        parent::__construct();
+    }
 
     public function configure()
     {
@@ -75,15 +103,11 @@ class ExportScanCommand extends ContainerAwareCommand
             $file = $applicationId . '_' . $scanId . '.' . $typeData['extension'];
         }
 
-        /** @var RequestService $requestService */
-        $requestService = $this->getContainer()->get(RequestService::class);
-        $queryParams = $requestService->transformParametersForQuery((array)$input->getOption('parameter'));
+        $queryParams = $this->requestService->transformParametersForQuery((array)$input->getOption('parameter'));
 
         $output->writeln('<comment>Info:</comment> Scan is being exported to "' . $file . '"', OutputInterface::VERBOSITY_VERBOSE);
 
-        /** @var ExportService $exportService */
-        $exportService = $this->getContainer()->get(ExportService::class);
-        call_user_func([$exportService, $typeData['method']], $applicationId, $scanId, $file, $queryParams);
+        call_user_func([$this->exportService, $typeData['method']], $applicationId, $scanId, $file, $queryParams);
 
         $output->writeln('<info>Success:</info> Scan was successfully exported to "' . $file . '"');
 
@@ -111,7 +135,7 @@ class ExportScanCommand extends ContainerAwareCommand
      */
     private function getTypes()
     {
-        return $this->getContainer()->getParameter(self::EXPORT_TYPES_PARAMETER);
+        return $this->container->getParameter(self::EXPORT_TYPES_PARAMETER);
     }
 
     /**

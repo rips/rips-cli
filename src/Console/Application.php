@@ -60,7 +60,7 @@ class Application extends BaseApplication
      */
     private function getVersionFromFile()
     {
-        $versionFile = $this->kernel->getRootDir() . '/../version.txt';
+        $versionFile = $this->kernel->getProjectDir() . '/version.txt';
         if (file_exists($versionFile)) {
             return (string)file_get_contents($versionFile);
         } else {
@@ -153,7 +153,7 @@ class Application extends BaseApplication
      */
     public function getLongVersion()
     {
-        return parent::getLongVersion().sprintf(' (kernel: <comment>%s</>, env: <comment>%s</>, debug: <comment>%s</>)', $this->kernel->getName(), $this->kernel->getEnvironment(), $this->kernel->isDebug() ? 'true' : 'false');
+        return parent::getLongVersion().sprintf(' (env: <comment>%s</>, debug: <comment>%s</>)', $this->kernel->getEnvironment(), $this->kernel->isDebug() ? 'true' : 'false');
     }
 
     public function add(Command $command)
