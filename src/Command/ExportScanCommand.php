@@ -36,8 +36,7 @@ class ExportScanCommand extends Command
         ContainerInterface $container,
         RequestService $requestService,
         ExportService $exportService
-    )
-    {
+    ) {
         $this->container = $container;
         $this->requestService = $requestService;
         $this->exportService = $exportService;

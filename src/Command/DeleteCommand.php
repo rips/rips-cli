@@ -45,8 +45,7 @@ class DeleteCommand extends Command
         TableColumnService $tableService,
         RequestService $requestService,
         PrettyOutputService $prettyOutputService
-    )
-    {
+    ) {
         $this->container = $container;
         $this->tableService = $tableService;
         $this->requestService = $requestService;

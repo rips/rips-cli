@@ -29,8 +29,7 @@ class ListSetupCommand extends Command
     public function __construct(
         ContainerInterface $container,
         TableColumnService $tableService
-    )
-    {
+    ) {
         $this->container = $container;
         $this->tableService = $tableService;
 

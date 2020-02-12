@@ -59,8 +59,7 @@ class StartScanCommand extends Command
         LanguageService $languageService,
         ArchiveService $archiveService,
         UploadService $uploadService
-    )
-    {
+    ) {
         $this->envService = $envService;
         $this->scanService = $scanService;
         $this->applicationService = $applicationService;

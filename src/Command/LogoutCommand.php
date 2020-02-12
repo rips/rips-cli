@@ -18,9 +18,7 @@ class LogoutCommand extends Command
      * LogoutCommand constructor.
      * @param CredentialService $credentialService
      */
-    public function __construct(
-        CredentialService $credentialService
-    )
+    public function __construct(CredentialService $credentialService)
     {
         $this->credentialService = $credentialService;
 

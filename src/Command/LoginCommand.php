@@ -44,8 +44,7 @@ class LoginCommand extends Command
         ConfigService $configService,
         CredentialService $credentialService,
         APIService $api
-    )
-    {
+    ) {
         $this->container = $container;
         $this->configService = $configService;
         $this->credentialService = $credentialService;
