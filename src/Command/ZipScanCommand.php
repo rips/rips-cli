@@ -3,16 +3,31 @@
 namespace App\Command;
 
 use App\Service\ArchiveService;
+use RIPS\ConnectorBundle\Entities\LanguageEntity;
 use RIPS\ConnectorBundle\Services\LanguageService;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
-class ZipScanCommand extends ContainerAwareCommand
+class ZipScanCommand extends Command
 {
+    /** @var LanguageService */
+    private $languageService;
+
+    /** @var ArchiveService */
+    private $archiveService;
+
+    public function __construct(LanguageService $languageService, ArchiveService $archiveService)
+    {
+        $this->languageService = $languageService;
+        $this->archiveService = $archiveService;
+
+        parent::__construct();
+    }
+
     public function configure()
     {
         $this
@@ -80,12 +95,10 @@ class ZipScanCommand extends ContainerAwareCommand
         }
 
         if (!$input->getOption('extensions') || !is_array($input->getOption('extensions'))) {
-            /** @var LanguageService $languagesService */
-            $languagesService = $this->getContainer()->get(LanguageService::class);
-            $languages = $languagesService->getAll()->getLanguages();
+            $languages = $this->languageService->getAll()->getLanguages();
             $extensions = $this->extractExtensions($languages, $language);
             if ($extensions === false) {
-                $languageNames = array_map(function ($language) {
+                $languageNames = array_map(function (LanguageEntity $language) {
                     return strtolower($language->getName());
                 }, $languages);
                 $output->writeln(
@@ -98,20 +111,18 @@ class ZipScanCommand extends ContainerAwareCommand
         }
 
         $path = (string)$input->getOption('path');
-        /** @var ArchiveService $archiveService */
-        $archiveService = $this->getContainer()->get(ArchiveService::class);
-        $archiveService->setFileExtensions((array)$input->getOption('extensions'));
+        $this->archiveService->setFileExtensions((array)$input->getOption('extensions'));
 
         if (is_dir($path)) {
             try {
-                $archiveService->folderToArchive($path, [], (string)$input->getOption('output-path'));
+                $this->archiveService->folderToArchive($path, [], (string)$input->getOption('output-path'));
             } catch (\Exception $e) {
                 $output->writeln('<error>Failure:</error> ' . $e->getMessage());
                 return 1;
             }
-        } elseif ($archiveService->isArchive($path)) {
+        } elseif ($this->archiveService->isArchive($path)) {
             try {
-                $archiveService->archiveToArchive($path, [], (string)$input->getOption('output-path'));
+                $this->archiveService->archiveToArchive($path, [], (string)$input->getOption('output-path'));
             } catch (\Exception $e) {
                 $output->writeln('<error>Failure:</error> ' . $e->getMessage());
                 return 1;
@@ -125,11 +136,11 @@ class ZipScanCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param \RIPS\ConnectorBundle\Entities\LanguageEntity[] $languages
+     * @param LanguageEntity[] $languages
      * @param string|null $chosenLanguage
      * @return bool|string[]
      */
-    private function extractExtensions($languages, $chosenLanguage = null)
+    private function extractExtensions(array $languages, ?string $chosenLanguage = null)
     {
         $result = [];
         $matched = false;
