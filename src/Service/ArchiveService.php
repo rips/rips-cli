@@ -161,11 +161,13 @@ class ArchiveService
             throw new \Exception('Extracting files to temporary directory failed');
         }
 
-        $newArchive =  $this->folderToArchive($tmpFolder, $excludePaths, $archivePath);
-
-        // We should remove the temporary folder (RCLI-123).
-        $fs = new Filesystem();
-        $fs->remove($tmpFolder);
+        try {
+            $newArchive =  $this->folderToArchive($tmpFolder, $excludePaths, $archivePath);
+        } finally {
+            // We should remove the temporary folder (RCLI-123).
+            $fs = new Filesystem();
+            $fs->remove($tmpFolder);
+        }
 
         return $newArchive;
     }
