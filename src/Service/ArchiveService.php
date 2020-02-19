@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 
 class ArchiveService
@@ -82,7 +83,7 @@ class ArchiveService
             \RecursiveIteratorIterator::SELF_FIRST
         );
         $directoryIterator->rewind();
-        
+
         while ($directoryIterator->valid()) {
             /** @var \SplFileInfo $file */
             foreach ($directoryIterator as $file) {
@@ -156,10 +157,18 @@ class ArchiveService
             throw new \Exception('Creating folder for temporary files extraction failed');
         }
 
-        if ($inputZip->extractTo($tmpFolder, $toExtract) === false) {
-            throw new \Exception('Extracting files to temporary directory failed');
+        try {
+            if ($inputZip->extractTo($tmpFolder, $toExtract) === false) {
+                throw new \Exception('Extracting files to temporary directory failed');
+            }
+
+            $newArchive =  $this->folderToArchive($tmpFolder, $excludePaths, $archivePath);
+        } finally {
+            // We should remove the temporary folder (RCLI-123).
+            $fs = new Filesystem();
+            $fs->remove($tmpFolder);
         }
 
-        return $this->folderToArchive($tmpFolder, $excludePaths, $archivePath);
+        return $newArchive;
     }
 }
