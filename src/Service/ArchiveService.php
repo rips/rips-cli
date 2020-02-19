@@ -157,11 +157,11 @@ class ArchiveService
             throw new \Exception('Creating folder for temporary files extraction failed');
         }
 
-        if ($inputZip->extractTo($tmpFolder, $toExtract) === false) {
-            throw new \Exception('Extracting files to temporary directory failed');
-        }
-
         try {
+            if ($inputZip->extractTo($tmpFolder, $toExtract) === false) {
+                throw new \Exception('Extracting files to temporary directory failed');
+            }
+
             $newArchive =  $this->folderToArchive($tmpFolder, $excludePaths, $archivePath);
         } finally {
             // We should remove the temporary folder (RCLI-123).
