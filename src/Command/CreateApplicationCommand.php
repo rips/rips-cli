@@ -2,9 +2,8 @@
 
 namespace App\Command;
 
-use RIPS\ConnectorBundle\InputBuilders\FilterBuilder;
+use App\Service\QuotaService;
 use RIPS\ConnectorBundle\Services\ApplicationService;
-use RIPS\ConnectorBundle\Services\QuotaService;
 use RIPS\ConnectorBundle\InputBuilders\ApplicationBuilder;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -84,7 +83,7 @@ class CreateApplicationCommand extends Command
         $language = (string)$input->getOption('language');
 
         if ($language) {
-            $quota = $this->getQuotaIdByLanguage($language);
+            $quota = $this->quotaService->getQuotaForLanguage($language);
             if (!$quota) {
                 $output->writeln('<error>Failure:</error> Could not find a valid quota for language ' . $language);
                 return 1;
@@ -92,8 +91,8 @@ class CreateApplicationCommand extends Command
         }
 
         if ($quota) {
-            $output->writeln('<comment>Info:</comment> Using quota "' . $quota . '" to create application', OutputInterface::VERBOSITY_VERBOSE);
-            $applicationInput->setChargedQuota($quota);
+            $output->writeln('<comment>Info:</comment> Using quota "' . $quota->getId() . '" to create application', OutputInterface::VERBOSITY_VERBOSE);
+            $applicationInput->setChargedQuota($quota->getId());
         }
 
         $output->writeln('<comment>Info:</comment> Trying to create application "' . $name . '"', OutputInterface::VERBOSITY_VERBOSE);
@@ -106,43 +105,5 @@ class CreateApplicationCommand extends Command
         $output->writeln('<comment>Info:</comment> Quota "' . $chargedQuota->getId() . '" was used to create application "' . $application->getName() . '" (' . $application->getId() . ')', OutputInterface::VERBOSITY_VERBOSE);
 
         return 0;
-    }
-
-    /**
-     * Try to find the first quota that expires and supports the given language.
-     *
-     * @param string $language
-     * @return int|null
-     * @throws \Exception
-     */
-    private function getQuotaIdByLanguage($language)
-    {
-        $now = new \DateTime();
-
-        $filterBuilder = new FilterBuilder();
-        $condition = $filterBuilder->and(
-            $filterBuilder->lessThan('validFrom', $now->format(DATE_ISO8601)),
-            $filterBuilder->greaterThan('validUntil', $now->format(DATE_ISO8601))
-        );
-
-        $quotas = $this->quotaService->getAll([
-            'filter'  => $filterBuilder->getFilterString($condition),
-            'orderBy' => json_encode(['validUntil' => 'asc'])
-        ])->getQuotas();
-
-        foreach ($quotas as $quota) {
-            if ($quota->getMaxApplications() && $quota->getCurrentApplication() >= $quota->getMaxApplications()) {
-                continue;
-            }
-            foreach ($quota->getLanguages() as $quotaLanguage) {
-                $idMatch = $quotaLanguage->getId() === (int)$language;
-                $nameMatch = strtolower($quotaLanguage->getName()) === strtolower($language);
-                if ($idMatch || $nameMatch) {
-                    return $quota->getId();
-                }
-            }
-        }
-
-        return null;
     }
 }
