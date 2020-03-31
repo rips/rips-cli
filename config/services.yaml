@@ -49,3 +49,8 @@ services:
 
     App\Service\RequestService:
         public: true
+
+    App\Service\QuotaService:
+        public: true
+        calls:
+            - [ setQuotaService, ['@RIPS\ConnectorBundle\Services\QuotaService'] ]
