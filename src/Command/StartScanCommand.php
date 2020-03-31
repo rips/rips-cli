@@ -4,6 +4,11 @@ namespace App\Command;
 
 use App\Service\ArchiveService;
 use App\Service\EnvService;
+use App\Service\QuotaService;
+use RIPS\ConnectorBundle\Entities\ApplicationEntity;
+use RIPS\ConnectorBundle\Entities\QuotaEntity;
+use RIPS\ConnectorBundle\InputBuilders\ApplicationBuilder;
+use RIPS\ConnectorBundle\InputBuilders\FilterBuilder;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Filesystem\Filesystem;
@@ -43,6 +48,9 @@ class StartScanCommand extends Command
     /** @var UploadService */
     private $uploadService;
 
+    /** @var QuotaService */
+    private $quotaService;
+
     /**
      * StartScanCommand constructor.
      * @param EnvService $envService
@@ -51,6 +59,7 @@ class StartScanCommand extends Command
      * @param LanguageService $languageService
      * @param ArchiveService $archiveService
      * @param UploadService $uploadService
+     * @param QuotaService $quotaService
      */
     public function __construct(
         EnvService $envService,
@@ -58,7 +67,8 @@ class StartScanCommand extends Command
         ApplicationService $applicationService,
         LanguageService $languageService,
         ArchiveService $archiveService,
-        UploadService $uploadService
+        UploadService $uploadService,
+        QuotaService $quotaService
     ) {
         $this->envService = $envService;
         $this->scanService = $scanService;
@@ -66,6 +76,7 @@ class StartScanCommand extends Command
         $this->languageService = $languageService;
         $this->archiveService = $archiveService;
         $this->uploadService = $uploadService;
+        $this->quotaService = $quotaService;
 
         parent::__construct();
     }
@@ -93,6 +104,8 @@ class StartScanCommand extends Command
             ->addOption('issue-type', 'I', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Override the issue types')
             ->addOption('source', 'S', InputOption::VALUE_REQUIRED, 'Modify the source of the scan', 'rips-cli')
             ->addOption('progress', 'G', InputOption::VALUE_NONE, 'Show progress bar')
+            ->addOption('application-name', 'A', InputOption::VALUE_REQUIRED, 'Search for or create application')
+            ->addOption('language', 'L', InputOption::VALUE_REQUIRED, 'Set application language for quota')
         ;
     }
 
@@ -125,6 +138,12 @@ class StartScanCommand extends Command
         } elseif ($input->getOption('remove-upload') && $input->getOption('keep-upload')) {
             $output->writeln('<error>Failure:</error> Remove-upload and keep-upload are not compatible');
             return 1;
+        } elseif ($input->getOption('application') && $input->getOption('application-name')) {
+            $output->writeln('<error>Failure:</error> Application and application-name are not compatible');
+            return 1;
+        } else if (!$input->getOption('application-name') && $input->getOption('language')) {
+            $output->writeln('<error>Failure:</error> Language requires application-name');
+            return 1;
         }
 
         $loginCommand = $this->getApplication()->find('rips:login');
@@ -137,6 +156,28 @@ class StartScanCommand extends Command
         if (!$input->getOption('path') && !$input->getOption('upload')) {
             $pathQuestion = new Question('Please enter a path: ');
             $input->setOption('path', $helper->ask($input, $output, $pathQuestion));
+        }
+
+        if ($input->getOption('application-name')) {
+            $application = $this->findApplicationByName($input->getOption('application-name'));
+            if (!$application) {
+                if (!$input->getOption('language')) {
+                    $output->writeln('<error>Failure:</error> Application not found and no quota language specified');
+                    return 1;
+                }
+                $language = $input->getOption('language');
+                $quota = $this->quotaService->getQuotaForLanguage($language);
+                if (!$quota) {
+                    $output->writeln('<error>Failure:</error> Could not find a valid quota for language ' . $language);
+                    return 1;
+                }
+                $application = $this->createApplication(
+                    $input->getOption('application-name'),
+                    $quota
+                );
+            }
+            $output->writeln('<comment>Info:</comment> Using dynamic application "' . $application->getId() . '"', OutputInterface::VERBOSITY_VERBOSE);
+            $input->setOption('application', $application->getId());
         }
 
         if (!$input->getOption('application')) {
@@ -418,5 +459,42 @@ class StartScanCommand extends Command
     {
         $phase = $scan->getPhase();
         return in_array($phase, [6, 7], true);
+    }
+
+    /**
+     * @param string $name
+     * @return ApplicationEntity|null
+     * @throws \Exception if there are multiple applications with this name
+     */
+    private function findApplicationByName(string $name)
+    {
+        $filterBuilder = new FilterBuilder();
+        $condition = $filterBuilder->equal('name', $name);
+
+        $applications = $this->applicationService->getAll([
+            'filter'  => $filterBuilder->getFilterString($condition)
+        ])->getApplications();
+
+        $applicationCount = count($applications);
+        if ($applicationCount === 0) {
+            return null;
+        } else if ($applicationCount === 1) {
+            return $applications[0];
+        } else {
+            throw new \Exception('The application name is not unique, found more than one application');
+        }
+    }
+
+    /**
+     * @param string $name
+     * @param QuotaEntity $quota
+     * @return ApplicationEntity
+     */
+    private function createApplication(string $name, QuotaEntity $quota)
+    {
+        $applicationInput = new ApplicationBuilder();
+        $applicationInput->setName($name);
+        $applicationInput->setChargedQuota($quota->getId());
+        return $this->applicationService->create($applicationInput)->getApplication();
     }
 }
