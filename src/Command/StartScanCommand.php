@@ -177,7 +177,7 @@ class StartScanCommand extends Command
                 );
             }
             $output->writeln('<comment>Info:</comment> Using dynamic application "' . $application->getId() . '"', OutputInterface::VERBOSITY_VERBOSE);
-            $input->setOption('application', $application->getId());
+            $input->setOption('application', (string)$application->getId());
         }
 
         if (!$input->getOption('application')) {
